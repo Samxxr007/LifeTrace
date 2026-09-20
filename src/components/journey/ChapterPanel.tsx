@@ -92,7 +92,7 @@ export default function ChapterPanel({ chapter, onClose, onExploreChapter }: Cha
                       <span className="font-bold truncate">{r.title}</span>
                       {r.source === 'synthetic' && (
                         <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200 shrink-0">
-                          Synthetic
+                          {r.type === 'place' ? 'Cafe & Place' : r.type === 'movie' ? 'Cinema' : r.type === 'event' ? 'Event' : 'Experience'}
                         </span>
                       )}
                     </div>

@@ -192,7 +192,7 @@ export default function TimelineBar({
             { id: 'expense', label: 'Expense' },
             { id: 'transaction', label: 'Transact' },
             { id: 'place', label: 'Places' },
-            { id: 'synthetic', label: 'Synthetic' },
+            { id: 'synthetic', label: 'Cafes & Events' },
             { id: 'user', label: 'User Added' },
           ].map((df) => (
             <button

@@ -97,7 +97,12 @@ function finalizeChapter(ch: Chapter, allConnections: Connection[]): Chapter {
   const syntheticCount = ch.receipts.filter(r => r.source === 'synthetic').length;
   
   // Chapter Titling: prioritize coherent synthetic scenarios when present
-  if (syntheticCount > 0 && syntheticCount >= Math.min(5, ch.receipts.length * 0.25)) {
+  if (syntheticCount > 0 && (syntheticCount >= 4 || syntheticCount >= ch.receipts.length * 0.2)) {
+    ch.dominantSource = 'synthetic';
+    const scenarioReceipt = ch.receipts.find(r => r.source === 'synthetic');
+    if (scenarioReceipt) {
+      ch.dominantType = scenarioReceipt.type;
+    }
     if (ch.receipts.some(r => r.tags?.includes('coffee') || r.tags?.includes('study'))) {
       ch.title = "Cafe & Study Routines";
     } else if (ch.receipts.some(r => r.type === 'movie' || r.tags?.includes('cinema'))) {
@@ -115,7 +120,7 @@ function finalizeChapter(ch: Chapter, allConnections: Connection[]): Chapter {
     } else {
       ch.title = `Life Scenarios & Experiences ${year}`;
     }
-    ch.narrative = `During this phase, data captures rich cross-domain moments combining music, dining, and local experiences. ${syntheticCount} life scenario moments enrich this chapter.`;
+    ch.narrative = `During this phase, data captures rich cross-domain moments combining music, dining, and local experiences. ${syntheticCount} cafe, movie, and life moments enrich this chapter.`;
   } else if (domType === 'music' && ch.receipts.some(r => r.type === 'music' && new Date(r.timestamp).getHours() >= 22)) {
     ch.title = "The Late-Night Sessions";
     ch.narrative = `Late-night music activity dominated this period, with listening concentrated between 10 PM and 3 AM.`;
@@ -142,7 +147,7 @@ function finalizeChapter(ch: Chapter, allConnections: Connection[]): Chapter {
     ch.narrative = `During this phase, data reflects a focus on ${domType} activities with ${ch.receipts.length} recorded moments.`;
   }
   
-  ch.subtitle = `${ch.receipts.length} moments recorded${syntheticCount > 0 ? ` (${syntheticCount} synthetic)` : ''}.`;
+  ch.subtitle = `${ch.receipts.length} moments recorded${syntheticCount > 0 ? ` (${syntheticCount} experiences)` : ''}.`;
   
   const ids = new Set(ch.receipts.map(r => r.id));
   ch.connections = allConnections.filter(c => ids.has(c.sourceId) && ids.has(c.targetId));

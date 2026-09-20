@@ -45,7 +45,13 @@ export function ReceiptDetail({ receipt, connections = [], allReceipts = [], onC
               <h3 className="font-display text-2xl text-ink-900 leading-tight">
                 {title}
               </h3>
-              {source === 'synthetic' && <Badge source="synthetic" label="Synthetic" size="sm" />}
+              {source === 'synthetic' && (
+                <Badge
+                  source="synthetic"
+                  label={type === 'place' ? 'Cafe / Place' : type === 'movie' ? 'Cinema' : type === 'event' ? 'Event' : 'Experience'}
+                  size="sm"
+                />
+              )}
             </div>
             <div className="flex items-center gap-1">
               <BookmarkButton
@@ -173,7 +179,7 @@ export function ReceiptDetail({ receipt, connections = [], allReceipts = [], onC
           Data Origin:{' '}
           <span className="font-semibold text-ink-800">
             {receipt.provenance === 'synthetic'
-              ? 'Synthetic enrichment'
+              ? 'Life Experiences (Cafes, Movies & Events)'
               : receipt.provenance === 'derived'
               ? 'Derived insight'
               : `${receipt.source?.replace(/_/g, ' ')} dataset`}

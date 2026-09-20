@@ -258,6 +258,57 @@ const LifeOrbitScene = ({
         </mesh>
       </group>
 
+      {/* Domain Planets — celestial bodies anchoring each major life domain */}
+      {/* Music Domain Planet */}
+      <group position={DOMAIN_CENTERS.music}>
+        <Sphere args={[0.65, 32, 32]}>
+          <meshStandardMaterial color="#C4622D" roughness={0.4} metalness={0.1} />
+        </Sphere>
+        <mesh rotation={[Math.PI / 3, 0, 0]}>
+          <ringGeometry args={[0.85, 0.96, 40]} />
+          <meshBasicMaterial color="#C4622D" side={THREE.DoubleSide} transparent opacity={0.5} />
+        </mesh>
+      </group>
+
+      {/* Household / Expense Domain Planet */}
+      <group position={DOMAIN_CENTERS.expense}>
+        <Sphere args={[0.6, 32, 32]}>
+          <meshStandardMaterial color="#3D5A47" roughness={0.4} metalness={0.1} />
+        </Sphere>
+        <mesh rotation={[Math.PI / 4, 0, 0]}>
+          <ringGeometry args={[0.78, 0.88, 40]} />
+          <meshBasicMaterial color="#3D5A47" side={THREE.DoubleSide} transparent opacity={0.5} />
+        </mesh>
+      </group>
+
+      {/* Transactions Domain Planet */}
+      <group position={DOMAIN_CENTERS.transaction}>
+        <Sphere args={[0.65, 32, 32]}>
+          <meshStandardMaterial color="#2B4B6F" roughness={0.4} metalness={0.1} />
+        </Sphere>
+        <mesh rotation={[-Math.PI / 4, 0, 0]}>
+          <ringGeometry args={[0.85, 0.96, 40]} />
+          <meshBasicMaterial color="#2B4B6F" side={THREE.DoubleSide} transparent opacity={0.5} />
+        </mesh>
+      </group>
+
+      {/* Cafes, Movies & Experiences Domain Planet */}
+      <group position={DOMAIN_CENTERS.synthetic}>
+        <Sphere args={[0.75, 32, 32]}>
+          <meshStandardMaterial color="#7B4B94" roughness={0.35} metalness={0.15} />
+        </Sphere>
+        {/* Inner bright ring */}
+        <mesh rotation={[Math.PI / 5, Math.PI / 6, 0]}>
+          <ringGeometry args={[0.95, 1.1, 48]} />
+          <meshBasicMaterial color="#9B6BB4" side={THREE.DoubleSide} transparent opacity={0.65} />
+        </mesh>
+        {/* Outer atmospheric ring */}
+        <mesh rotation={[Math.PI / 5, Math.PI / 6, 0]}>
+          <ringGeometry args={[1.2, 1.28, 48]} />
+          <meshBasicMaterial color="#C4A5DC" side={THREE.DoubleSide} transparent opacity={0.4} />
+        </mesh>
+      </group>
+
       {/* Domain Markers (Clean HTML badges that never clip) */}
       <Html position={[-3.8, 3.2, 0]} center style={{ pointerEvents: 'none' }}>
         <div className="bg-burnt-100/90 border border-burnt-500/40 px-2 py-0.5 rounded text-[10px] font-mono text-burnt-700 uppercase tracking-widest whitespace-nowrap shadow-xs">
@@ -274,9 +325,9 @@ const LifeOrbitScene = ({
           ✦ Transactions Domain
         </div>
       </Html>
-      <Html position={[0.0, 4.4, 0]} center style={{ pointerEvents: 'none' }}>
-        <div className="bg-purple-100/90 border border-purple-500/40 px-2 py-0.5 rounded text-[10px] font-mono text-purple-800 uppercase tracking-widest whitespace-nowrap shadow-xs">
-          ✦ Synthetic Scenarios Domain
+      <Html position={[0.0, 4.6, 0]} center style={{ pointerEvents: 'none' }}>
+        <div className="bg-purple-100/90 border border-purple-500/40 px-2.5 py-0.5 rounded text-[10px] font-mono text-purple-800 uppercase tracking-widest whitespace-nowrap shadow-xs">
+          ✦ Cafes, Movies & Experiences Domain
         </div>
       </Html>
 

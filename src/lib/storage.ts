@@ -671,6 +671,24 @@ export const DEFAULT_BOOKMARKS: BookmarkItem[] = [
     createdAt: '2023-07-23T11:00:00.000Z',
     note: 'A masterclass in sound design and non-linear pacing.',
   },
+  {
+    id: 'bookmark-05',
+    targetId: 'user-receipt-04',
+    targetType: 'receipt',
+    title: 'Flight Ticket to Kochi-Muziris Biennale',
+    subtitle: 'Travel • 20 Jan 2023',
+    createdAt: '2023-01-21T09:00:00.000Z',
+    note: 'The beginning of an unforgettable art weekend across pepper warehouses.',
+  },
+  {
+    id: 'bookmark-06',
+    targetId: 'user-receipt-03',
+    targetType: 'receipt',
+    title: 'Morning 10K Run along Marine Drive',
+    subtitle: 'Fitness • 10 Dec 2023',
+    createdAt: '2023-12-11T08:00:00.000Z',
+    note: 'Personal best pace under the crisp Arabian Sea sunrise.',
+  },
 ];
 
 export const DEFAULT_FEATURED: FeaturedItem[] = [
@@ -719,7 +737,7 @@ export const DEFAULT_FUTURE_EVENTS: FutureEvent[] = [
   },
   {
     id: 'future-02',
-    title: 'Tokyo Cherry Blossom & Jazz Kissatten Tour',
+    title: 'Tokyo Cherry Blossom & Jazz Kissaten Tour',
     date: '2027-04-02',
     time: '09:00',
     location: 'Tokyo, Japan',
@@ -753,6 +771,30 @@ export const DEFAULT_FUTURE_EVENTS: FutureEvent[] = [
     status: 'future',
     createdAt: '2026-01-05T00:00:00.000Z',
   },
+  {
+    id: 'future-05',
+    title: 'Modern Frontend Architecture Summit',
+    date: '2026-09-28',
+    time: '09:30',
+    location: 'Convention Center',
+    category: 'Technology',
+    type: 'event',
+    notes: 'Keynote on local-first web applications and digital memory archives.',
+    status: 'future',
+    createdAt: '2026-01-05T00:00:00.000Z',
+  },
+  {
+    id: 'future-06',
+    title: 'Annual Spotify Hi-Fi Vinyl Boxset Release',
+    date: '2026-10-01',
+    time: '12:00',
+    location: 'Online Store',
+    category: 'Music',
+    type: 'purchase',
+    notes: 'Limited edition analog pressing pre-order.',
+    status: 'future',
+    createdAt: '2026-01-05T00:00:00.000Z',
+  },
 ];
 
 export const DEFAULT_SAVED_VIEWS: SavedView[] = [
@@ -777,41 +819,69 @@ export const DEFAULT_SAVED_VIEWS: SavedView[] = [
     filters: { sources: ['user', 'synthetic'] },
     createdAt: '2026-01-10T00:00:00.000Z',
   },
+  {
+    id: 'saved-view-04',
+    name: 'Cafes & Weekend Study Routines',
+    type: 'explore',
+    filters: { types: ['place', 'expense'], search: 'cafe' },
+    createdAt: '2026-01-10T00:00:00.000Z',
+  },
+  {
+    id: 'saved-view-05',
+    name: 'Cinema & Evening Screenings',
+    type: 'explore',
+    filters: { types: ['movie'], search: 'cinema' },
+    createdAt: '2026-01-10T00:00:00.000Z',
+  },
 ];
 
 export function hasAnyUserData(): boolean {
+  const receipts = safeParse<any[]>(safeGetItem(STORAGE_KEYS.USER_RECEIPTS), []);
+  const diary = safeParse<any[]>(safeGetItem(STORAGE_KEYS.DIARY), []);
+  const bookmarks = safeParse<any[]>(safeGetItem(STORAGE_KEYS.BOOKMARKS), []);
+  const featured = safeParse<any[]>(safeGetItem(STORAGE_KEYS.FEATURED), []);
+  const future = safeParse<any[]>(safeGetItem(STORAGE_KEYS.FUTURE_EVENTS), []);
+  const views = safeParse<any[]>(safeGetItem(STORAGE_KEYS.SAVED_VIEWS), []);
+
   return (
-    safeGetItem(STORAGE_KEYS.USER_RECEIPTS) !== null ||
-    safeGetItem(STORAGE_KEYS.DIARY) !== null ||
-    safeGetItem(STORAGE_KEYS.BOOKMARKS) !== null ||
-    safeGetItem(STORAGE_KEYS.FEATURED) !== null ||
-    safeGetItem(STORAGE_KEYS.FUTURE_EVENTS) !== null ||
-    safeGetItem(STORAGE_KEYS.SAVED_VIEWS) !== null
+    receipts.length > 0 &&
+    diary.length > 0 &&
+    bookmarks.length > 0 &&
+    featured.length > 0 &&
+    future.length > 0 &&
+    views.length > 0
   );
 }
 
 export function seedSampleUserData(force = false): void {
-  if (force || safeGetItem(STORAGE_KEYS.USER_RECEIPTS) === null) {
+  const receipts = safeParse<any[]>(safeGetItem(STORAGE_KEYS.USER_RECEIPTS), []);
+  const diary = safeParse<any[]>(safeGetItem(STORAGE_KEYS.DIARY), []);
+  const bookmarks = safeParse<any[]>(safeGetItem(STORAGE_KEYS.BOOKMARKS), []);
+  const featured = safeParse<any[]>(safeGetItem(STORAGE_KEYS.FEATURED), []);
+  const future = safeParse<any[]>(safeGetItem(STORAGE_KEYS.FUTURE_EVENTS), []);
+  const views = safeParse<any[]>(safeGetItem(STORAGE_KEYS.SAVED_VIEWS), []);
+
+  if (force || receipts.length === 0) {
     safeSetItem(STORAGE_KEYS.USER_RECEIPTS, JSON.stringify(DEFAULT_USER_RECEIPTS));
     notifyChange(STORAGE_KEYS.USER_RECEIPTS);
   }
-  if (force || safeGetItem(STORAGE_KEYS.DIARY) === null) {
+  if (force || diary.length === 0) {
     safeSetItem(STORAGE_KEYS.DIARY, JSON.stringify(DEFAULT_DIARY_ENTRIES));
     notifyChange(STORAGE_KEYS.DIARY);
   }
-  if (force || safeGetItem(STORAGE_KEYS.BOOKMARKS) === null) {
+  if (force || bookmarks.length === 0) {
     safeSetItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(DEFAULT_BOOKMARKS));
     notifyChange(STORAGE_KEYS.BOOKMARKS);
   }
-  if (force || safeGetItem(STORAGE_KEYS.FEATURED) === null) {
+  if (force || featured.length === 0) {
     safeSetItem(STORAGE_KEYS.FEATURED, JSON.stringify(DEFAULT_FEATURED));
     notifyChange(STORAGE_KEYS.FEATURED);
   }
-  if (force || safeGetItem(STORAGE_KEYS.FUTURE_EVENTS) === null) {
+  if (force || future.length === 0) {
     safeSetItem(STORAGE_KEYS.FUTURE_EVENTS, JSON.stringify(DEFAULT_FUTURE_EVENTS));
     notifyChange(STORAGE_KEYS.FUTURE_EVENTS);
   }
-  if (force || safeGetItem(STORAGE_KEYS.SAVED_VIEWS) === null) {
+  if (force || views.length === 0) {
     safeSetItem(STORAGE_KEYS.SAVED_VIEWS, JSON.stringify(DEFAULT_SAVED_VIEWS));
     notifyChange(STORAGE_KEYS.SAVED_VIEWS);
   }
@@ -821,8 +891,10 @@ export function resetSampleUserData(): void {
   seedSampleUserData(true);
 }
 
-export function initSampleUserData(): void {
-  if (!hasAnyUserData()) {
-    seedSampleUserData(false);
+export function initSampleUserData(force = false): void {
+  const isSeededV6 = safeGetItem('lifetrace_seed_v6') === 'true';
+  if (force || !isSeededV6 || !hasAnyUserData()) {
+    seedSampleUserData(true);
+    safeSetItem('lifetrace_seed_v6', 'true');
   }
 }

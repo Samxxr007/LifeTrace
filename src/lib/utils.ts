@@ -146,7 +146,7 @@ export const SOURCE_LABELS: Record<DataSource, string> = {
   spotify: 'Spotify',
   household: 'Household',
   transactions: 'Transactions',
-  synthetic: 'Synthetic',
+  synthetic: 'Cafes & Experiences',
   user: 'User Created',
   derived: 'Derived',
 };

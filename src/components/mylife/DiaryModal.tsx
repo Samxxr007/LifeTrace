@@ -180,9 +180,20 @@ export function DiaryModal({
 
         {/* Optional User-Selected Mood */}
         <div>
-          <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1.5 flex items-center gap-1">
-            <Smile size={13} />
-            <span>Optional Mood (User-Selected Only)</span>
+          <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1.5 flex items-center justify-between">
+            <span className="flex items-center gap-1">
+              <Smile size={13} />
+              <span>Optional Mood (User-Selected Only)</span>
+            </span>
+            {selectedMood && (
+              <button
+                type="button"
+                onClick={() => setSelectedMood(undefined)}
+                className="text-[11px] font-mono text-crimson-600 hover:underline"
+              >
+                Clear Mood
+              </button>
+            )}
           </label>
           <div className="flex flex-wrap gap-1.5">
             {USER_MOODS.map((mood) => {
@@ -191,17 +202,32 @@ export function DiaryModal({
                 <button
                   type="button"
                   key={mood}
-                  onClick={() => setSelectedMood(isSelected ? undefined : mood)}
-                  className={`px-2.5 py-1 text-xs font-mono rounded-xs border transition-colors ${
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedMood(isSelected ? undefined : mood);
+                  }}
+                  aria-pressed={isSelected}
+                  className={`px-2.5 py-1 text-xs font-mono rounded-xs border transition-all flex items-center gap-1 ${
                     isSelected
-                      ? 'bg-ink-900 text-parchment-100 border-ink-900 font-bold'
-                      : 'bg-parchment-50 text-ink-700 border-ink-200 hover:bg-parchment-200'
+                      ? 'bg-ink-900 text-parchment-100 border-ink-900 font-bold shadow-xs'
+                      : 'bg-parchment-50 text-ink-700 border-ink-300 hover:bg-parchment-200'
                   }`}
                 >
-                  {mood}
+                  {isSelected && <Check size={12} className="text-parchment-100" />}
+                  <span>{mood}</span>
                 </button>
               );
             })}
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-[11px] font-mono text-ink-500 shrink-0">Or custom:</span>
+            <input
+              type="text"
+              value={USER_MOODS.includes(selectedMood || '') ? '' : selectedMood || ''}
+              onChange={(e) => setSelectedMood(e.target.value.trim() ? e.target.value : undefined)}
+              placeholder="Type your own mood (e.g. Nostalgic, Melancholic)..."
+              className="flex-1 px-2.5 py-1 bg-parchment-50 border border-ink-300 rounded-sm text-xs text-ink-900 focus:outline-none focus:ring-1 focus:ring-ink-900"
+            />
           </div>
         </div>
 

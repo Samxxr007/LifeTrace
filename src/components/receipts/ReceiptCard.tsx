@@ -63,7 +63,11 @@ const ReceiptCard = React.memo(({
               {title}
             </h3>
             {showSource && isSynthetic && (
-              <Badge source="synthetic" label="Synthetic" size="sm" />
+              <Badge
+                source="synthetic"
+                label={type === 'place' ? 'Cafe / Place' : type === 'movie' ? 'Cinema' : type === 'event' ? 'Event' : 'Experience'}
+                size="sm"
+              />
             )}
           </div>
           <div className="flex items-center space-x-2 text-xs text-ink-500 font-body mt-0.5">

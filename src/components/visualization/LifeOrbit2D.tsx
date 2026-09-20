@@ -68,13 +68,28 @@ export default function LifeOrbit2D({ chapters, selectedChapterId, onNodeSelect,
   return (
     <div className="w-full h-full bg-parchment-100 relative overflow-hidden" role="img" aria-label="2D Visualization of Life Data Chapters">
       <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
-        {/* Domain Labels */}
+        {/* Domain Planets & Labels */}
         {!filterSource && (
-          <g className="text-ink-700 font-display text-lg opacity-50" textAnchor="middle">
-            <text x="200" y="100">Music</text>
-            <text x="200" y="550">Expenses</text>
-            <text x="600" y="300">Transactions</text>
-            <text x="400" y="70">Synthetic Scenarios</text>
+          <g textAnchor="middle">
+            {/* Music Planet */}
+            <circle cx="200" cy="140" r="24" fill="none" stroke="#C4622D" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+            <circle cx="200" cy="140" r="16" fill="#C4622D" opacity="0.85" />
+            <text x="200" y="95" className="text-ink-700 font-display text-sm font-semibold opacity-70">Music</text>
+
+            {/* Expenses Planet */}
+            <circle cx="200" cy="510" r="24" fill="none" stroke="#3D5A47" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+            <circle cx="200" cy="510" r="16" fill="#3D5A47" opacity="0.85" />
+            <text x="200" y="555" className="text-ink-700 font-display text-sm font-semibold opacity-70">Expenses</text>
+
+            {/* Transactions Planet */}
+            <circle cx="600" cy="300" r="24" fill="none" stroke="#2B4B6F" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+            <circle cx="600" cy="300" r="16" fill="#2B4B6F" opacity="0.85" />
+            <text x="600" y="260" className="text-ink-700 font-display text-sm font-semibold opacity-70">Transactions</text>
+
+            {/* Cafes & Experiences Planet */}
+            <circle cx="400" cy="110" r="32" fill="none" stroke="#7B4B94" strokeWidth="1" strokeDasharray="4 3" opacity="0.5" />
+            <circle cx="400" cy="110" r="20" fill="#7B4B94" opacity="0.9" />
+            <text x="400" y="65" className="text-purple-900 font-display text-sm font-semibold opacity-85">Cafes, Movies & Experiences</text>
           </g>
         )}
 

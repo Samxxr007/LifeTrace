@@ -55,13 +55,19 @@ export default function MyLife() {
   const [activeTab, setActiveTab] = useState<MyLifeTab>('diary');
   const [selectedReceipt, setSelectedReceipt] = useState<LifeReceipt | null>(null);
 
-  // Automatically initialize sample archive data if storage is completely empty
+  // Automatically initialize sample archive data if any collection is empty
   useEffect(() => {
-    if (!storage.hasAnyUserData()) {
-      storage.seedSampleUserData();
+    if (
+      userReceipts.length === 0 ||
+      bookmarks.length === 0 ||
+      futureEvents.length === 0 ||
+      savedViews.length === 0 ||
+      diaryEntries.length === 0
+    ) {
+      storage.seedSampleUserData(true);
       refreshAll();
     }
-  }, [refreshAll]);
+  }, [userReceipts.length, bookmarks.length, futureEvents.length, savedViews.length, diaryEntries.length, refreshAll]);
 
   // Dialog states
   const [addReceiptOpen, setAddReceiptOpen] = useState(false);

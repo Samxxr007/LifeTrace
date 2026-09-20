@@ -36,9 +36,9 @@ export const QUICK_PERIODS: QuickPeriod[] = [
   },
   {
     id: 'synthetic',
-    label: 'Synthetic Scenarios (2016–2024)',
+    label: 'Cafes, Movies & Experiences (2016–2024)',
     range: ['2016-01-01T00:00:00Z', '2024-12-31T23:59:59Z'],
-    description: '36 coherent multi-domain life scenarios across 8 families.',
+    description: 'Coherent life moments across cafes, movies, travel, tech meetups, and fitness.',
   },
 ];
 
