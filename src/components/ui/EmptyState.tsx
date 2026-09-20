@@ -44,8 +44,8 @@ export const EmptySearchResults = () => (
 export const EmptyConnections = () => (
   <EmptyState
     icon={Link2}
-    title="No connected moments"
-    description="This record doesn't seem to have any related moments in your timeline yet."
+    title="No direct connections found"
+    description="No qualifying relationship was detected for this receipt under the current connection model."
   />
 );
 

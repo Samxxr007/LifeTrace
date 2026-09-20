@@ -35,6 +35,11 @@ export default function Discover() {
 
   const [filters, setFilters] = useState<FilterState>({ strength: 'All', type: 'All' });
   const [selectedConnectionId, setSelectedConnectionId] = useState<string | null>(null);
+  const [displayLimit, setDisplayLimit] = useState(100);
+
+  useEffect(() => {
+    setDisplayLimit(100);
+  }, [filters]);
 
   useEffect(() => {
     if (connections.length > 0 && !selectedConnectionId) {
@@ -54,6 +59,7 @@ export default function Discover() {
     return true;
   });
 
+  const visibleConnections = filteredConnections.slice(0, displayLimit);
   const selectedConnection = filteredConnections.find(c => c.id === selectedConnectionId) || filteredConnections[0];
   const connReceiptA = selectedConnection ? receipts.find(r => r.id === selectedConnection.sourceId) : null;
   const connReceiptB = selectedConnection ? receipts.find(r => r.id === selectedConnection.targetId) : null;
@@ -126,7 +132,7 @@ export default function Discover() {
               <div className="flex flex-col md:flex-row gap-8 mt-8">
                 {/* Connection list */}
                 <div className="md:w-[40%] space-y-3 max-h-[80vh] overflow-y-auto pr-2">
-                  {filteredConnections.map(conn => (
+                  {visibleConnections.map(conn => (
                     <button
                       key={conn.id}
                       onClick={() => setSelectedConnectionId(conn.id)}
@@ -144,6 +150,15 @@ export default function Discover() {
                       />
                     </button>
                   ))}
+
+                  {filteredConnections.length > displayLimit && (
+                    <button
+                      onClick={() => setDisplayLimit(prev => prev + 100)}
+                      className="w-full py-3 mt-4 text-center font-mono text-xs uppercase tracking-wider text-ink-700 bg-parchment-200 hover:bg-parchment-300 border border-ink-300 transition-colors"
+                    >
+                      Load more connections ({filteredConnections.length - displayLimit} remaining)
+                    </button>
+                  )}
                 </div>
 
                 {/* Explainer panel */}

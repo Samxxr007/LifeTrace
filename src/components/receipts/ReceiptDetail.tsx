@@ -8,11 +8,12 @@ import { EmptyConnections } from '../ui/EmptyState';
 interface ReceiptDetailProps {
   receipt: LifeReceipt;
   connections?: Connection[];
+  allReceipts?: LifeReceipt[];
   onClose: () => void;
   onReceiptClick?: (receiptId: string) => void;
 }
 
-export function ReceiptDetail({ receipt, connections = [], onClose: _onClose, onReceiptClick }: ReceiptDetailProps) {
+export function ReceiptDetail({ receipt, connections = [], allReceipts = [], onClose: _onClose, onReceiptClick }: ReceiptDetailProps) {
   const { type, title, timestamp, amount, source, category, subcategory, location, metadata } = receipt;
 
   const renderField = (label: string, value?: string | number | null) => {
@@ -77,36 +78,65 @@ export function ReceiptDetail({ receipt, connections = [], onClose: _onClose, on
         {connections.length === 0 ? (
           <EmptyConnections />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {connections.slice(0, 5).map((conn) => {
               const otherReceiptId = conn.sourceId === receipt.id ? conn.targetId : conn.sourceId;
+              const otherReceipt = allReceipts.find((r) => r.id === otherReceiptId);
+
               return (
-                <button
+                <div
                   key={conn.id}
-                  onClick={() => onReceiptClick?.(otherReceiptId)}
-                  className="w-full text-left flex items-start p-3 bg-parchment-200 hover:bg-parchment-100 border border-ink-300 transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-ink-900"
+                  className="p-3 bg-parchment-200 border border-ink-300 transition-colors"
                 >
-                  <div className="mr-3 mt-0.5">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <button
+                      onClick={() => onReceiptClick?.(otherReceiptId)}
+                      className="font-display text-base text-ink-900 hover:text-burnt-600 transition-colors text-left font-semibold focus:outline-none focus-visible:underline"
+                    >
+                      {otherReceipt ? otherReceipt.title : otherReceiptId}
+                    </button>
                     <span
-                      className={`inline-block w-2 h-2 rounded-full ${
+                      className={`shrink-0 font-mono text-[10px] uppercase px-1.5 py-0.5 border ${
                         conn.strength === 'strong'
-                          ? 'bg-burnt-500'
+                          ? 'border-burnt-500 text-burnt-600 bg-burnt-50'
                           : conn.strength === 'moderate'
-                          ? 'bg-amber-500'
-                          : 'bg-ink-400'
+                          ? 'border-amber-500 text-amber-600 bg-amber-50'
+                          : 'border-ink-400 text-ink-500'
                       }`}
-                      aria-hidden="true"
-                    />
+                    >
+                      {conn.strength}
+                    </span>
                   </div>
-                  <div className="min-w-0">
-                    <p className="font-mono text-xs uppercase text-ink-500 mb-1">
-                      {conn.strength} connection
+
+                  {otherReceipt && (
+                    <p className="font-mono text-xs text-ink-500 mb-2">
+                      {formatDate(otherReceipt.timestamp, 'MMM d, yyyy · h:mm a')} · {otherReceipt.source}
                     </p>
-                    <p className="font-body text-sm text-ink-700">
-                      {conn.explanation}
-                    </p>
-                  </div>
-                </button>
+                  )}
+
+                  <p className="font-mono text-xs uppercase tracking-wider text-ink-600 mb-1">
+                    Connected because:
+                  </p>
+                  <ul className="list-disc list-inside space-y-0.5 mb-3 text-xs font-body text-ink-700">
+                    {conn.signals && conn.signals.length > 0 ? (
+                      conn.signals.map((sig, sIdx) => (
+                        <li key={sIdx}>
+                          <span className="font-mono text-[11px] uppercase text-ink-500">[{sig.type.replace(/_/g, ' ')}]</span>{' '}
+                          {sig.label}
+                        </li>
+                      ))
+                    ) : (
+                      <li>{conn.explanation}</li>
+                    )}
+                  </ul>
+
+                  <button
+                    onClick={() => onReceiptClick?.(otherReceiptId)}
+                    className="font-mono text-xs uppercase tracking-wider text-ink-900 hover:underline flex items-center gap-1"
+                  >
+                    <span>View connected receipt →</span>
+                  </button>
+                </div>
               );
             })}
           </div>

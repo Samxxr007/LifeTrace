@@ -306,6 +306,7 @@ export default function Explore() {
             <ReceiptDetail
               receipt={selectedReceipt}
               connections={receiptConnections}
+              allReceipts={receipts}
               onClose={() => setSelectedReceipt(null)}
               onReceiptClick={(id) => {
                 const r = receipts.find((rec) => rec.id === id);
