@@ -34,6 +34,12 @@ export const QUICK_PERIODS: QuickPeriod[] = [
     range: ['2022-01-01T00:00:00Z', '2024-12-31T23:59:59Z'],
     description: 'Modern financial transactions and digital commerce activity.',
   },
+  {
+    id: 'synthetic',
+    label: 'Synthetic Scenarios (2016–2024)',
+    range: ['2016-01-01T00:00:00Z', '2024-12-31T23:59:59Z'],
+    description: '36 coherent multi-domain life scenarios across 8 families.',
+  },
 ];
 
 export function useJourney(
@@ -53,7 +59,16 @@ export function useJourney(
 
     return chapters.filter((ch) => {
       // Source match
-      if (filterSource && ch.dominantSource !== filterSource) return false;
+      if (filterSource) {
+        if (filterSource === 'synthetic') {
+          const hasSynthetic =
+            ch.dominantSource === 'synthetic' ||
+            ch.receipts.some((r) => r.source === 'synthetic');
+          if (!hasSynthetic) return false;
+        } else if (ch.dominantSource !== filterSource) {
+          return false;
+        }
+      }
 
       // Date range overlap match
       const chStart = new Date(ch.dateRange[0]).getTime();

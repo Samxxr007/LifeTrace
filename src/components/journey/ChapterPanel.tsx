@@ -86,9 +86,16 @@ export default function ChapterPanel({ chapter, onClose, onExploreChapter }: Cha
             <div className="mb-8">
               <h4 className="text-label text-ink-500 tracking-widest mb-4">KEY MOMENTS</h4>
               <div className="space-y-3">
-                {chapter.receipts.slice(0,3).map(r => (
+                {chapter.receipts.slice(0, 3).map((r) => (
                   <div key={r.id} className="p-3 bg-parchment-200 rounded text-sm font-body">
-                    <span className="font-bold block mb-1">{r.title}</span>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-bold truncate">{r.title}</span>
+                      {r.source === 'synthetic' && (
+                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200 shrink-0">
+                          Synthetic
+                        </span>
+                      )}
+                    </div>
                     <span className="text-ink-500 font-mono text-xs">{new Date(r.timestamp).toLocaleDateString()}</span>
                   </div>
                 ))}

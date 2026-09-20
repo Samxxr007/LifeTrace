@@ -1,8 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { initSampleUserData } from '@/lib/storage';
 
 // Lazy-loaded pages for code splitting
 const Landing     = lazy(() => import('@/pages/Landing'));
@@ -18,6 +19,10 @@ const PageFallback = ({ message }: { message?: string }) => (
 );
 
 export default function App() {
+  useEffect(() => {
+    initSampleUserData();
+  }, []);
+
   return (
     <BrowserRouter>
       <ErrorBoundary>

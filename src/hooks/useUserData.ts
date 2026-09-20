@@ -145,6 +145,16 @@ export function useUserData() {
     return storage.saveUserProfile(profile);
   }, []);
 
+  const resetSampleData = useCallback(() => {
+    storage.resetSampleUserData();
+    refreshAll();
+  }, [refreshAll]);
+
+  const seedSampleData = useCallback((force = false) => {
+    storage.seedSampleUserData(force);
+    refreshAll();
+  }, [refreshAll]);
+
   return {
     ...data,
     refreshAll,
@@ -162,5 +172,7 @@ export function useUserData() {
     deleteFutureEvent,
     completeFutureEvent,
     updateProfile,
+    resetSampleData,
+    seedSampleData,
   };
 }

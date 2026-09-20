@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLifeData } from '@/hooks/useLifeData';
 import { useUserData } from '@/hooks/useUserData';
+import * as storage from '@/lib/storage';
 import { useConnections } from '@/hooks/useConnections';
 import { getConnectionsForReceipt } from '@/engine/connections';
 import { formatDate, formatAmount } from '@/lib/utils';
@@ -47,10 +48,20 @@ export default function MyLife() {
     updateProfile,
     deleteUserReceipt,
     deleteSavedView,
+    resetSampleData,
+    refreshAll,
   } = useUserData();
 
   const [activeTab, setActiveTab] = useState<MyLifeTab>('diary');
   const [selectedReceipt, setSelectedReceipt] = useState<LifeReceipt | null>(null);
+
+  // Automatically initialize sample archive data if storage is completely empty
+  useEffect(() => {
+    if (!storage.hasAnyUserData()) {
+      storage.seedSampleUserData();
+      refreshAll();
+    }
+  }, [refreshAll]);
 
   // Dialog states
   const [addReceiptOpen, setAddReceiptOpen] = useState(false);
@@ -164,6 +175,18 @@ export default function MyLife() {
 
             {/* Quick Action CTAs */}
             <div className="flex flex-wrap items-center gap-2.5">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  resetSampleData();
+                }}
+                className="flex items-center gap-1.5 border-amber-600/50 bg-amber-50/80 text-amber-900 hover:bg-amber-100 hover:border-amber-700 transition-all font-medium"
+                title="Sync and restore curated sample moments, diary entries, bookmarks, and future plans"
+              >
+                <Sparkles size={14} className="text-amber-600" />
+                <span>Sync Sample Archive</span>
+              </Button>
               <Button
                 variant="primary"
                 size="sm"

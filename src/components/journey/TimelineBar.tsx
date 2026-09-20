@@ -65,6 +65,7 @@ export default function TimelineBar({
   const filteredReceipts = useMemo(() => {
     if (activeDomainFilter === 'all') return receipts;
     if (activeDomainFilter === 'user') return receipts.filter((r) => r.source === 'user');
+    if (activeDomainFilter === 'synthetic') return receipts.filter((r) => r.source === 'synthetic');
     return receipts.filter((r) => r.type === activeDomainFilter);
   }, [receipts, activeDomainFilter]);
 
@@ -191,6 +192,7 @@ export default function TimelineBar({
             { id: 'expense', label: 'Expense' },
             { id: 'transaction', label: 'Transact' },
             { id: 'place', label: 'Places' },
+            { id: 'synthetic', label: 'Synthetic' },
             { id: 'user', label: 'User Added' },
           ].map((df) => (
             <button

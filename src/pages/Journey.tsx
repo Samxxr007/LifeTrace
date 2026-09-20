@@ -121,6 +121,14 @@ export default function Journey() {
           >
             TRANSACTIONS
           </button>
+          <button
+            onClick={() => setFilterSource('synthetic')}
+            className={`px-3 py-1 font-mono text-xs tracking-wider rounded-sm transition-colors ${
+              filterSource === 'synthetic' ? 'bg-purple-700 text-parchment-100 font-bold' : 'text-ink-600 hover:text-purple-800'
+            }`}
+          >
+            SYNTHETIC
+          </button>
         </div>
       </div>
 
@@ -190,6 +198,9 @@ export default function Journey() {
           </span>
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-navy-500 inline-block" /> Transactions
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-purple-600 inline-block" /> Synthetic
           </span>
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" /> The Convergence
@@ -262,9 +273,16 @@ export default function Journey() {
                     >
                       {chapter.dominantType}
                     </span>
-                    <span className="font-mono text-xs text-ink-500">
-                      {formatCount(chapter.stats.totalReceipts)} moments
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {chapter.receipts.some((r) => r.source === 'synthetic') && (
+                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">
+                          Synthetic
+                        </span>
+                      )}
+                      <span className="font-mono text-xs text-ink-500">
+                        {formatCount(chapter.stats.totalReceipts)} moments
+                      </span>
+                    </div>
                   </div>
 
                   <h4 className="font-display text-xl font-bold text-ink-900 mb-1">{chapter.title}</h4>

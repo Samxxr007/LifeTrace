@@ -426,3 +426,403 @@ export function saveUserProfile(profile: Partial<UserProfile>): UserProfile {
   notifyChange(STORAGE_KEYS.USER_PROFILE);
   return updated;
 }
+
+// ==========================================
+// 8. Curated Sample Life Data & Syncing
+// ==========================================
+
+export const DEFAULT_USER_RECEIPTS: LifeReceipt[] = [
+  {
+    id: 'user-receipt-01',
+    type: 'expense',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-11-14T20:30:00.000Z',
+    title: 'Anniversary Dinner at Olive Beach',
+    description: 'Celebratory 5th anniversary dinner in the courtyard under the banyan tree.',
+    category: 'Dining',
+    subcategory: 'Restaurant',
+    amount: 3850,
+    currency: 'INR',
+    expenseType: 'Expense',
+    location: { city: 'Bangalore', locationName: 'Olive Beach, Wood Street' },
+    metadata: { merchant: 'Olive Beach', paymentMode: 'Card', partySize: 2 },
+    tags: ['dining', 'anniversary', 'user-created', 'celebration', 'bangalore'],
+  },
+  {
+    id: 'user-receipt-02',
+    type: 'expense',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-09-03T16:45:00.000Z',
+    title: 'Vinyl Record Haul — Abbey Road & Kind of Blue',
+    description: 'Acquired 180g analog pressings of Abbey Road and Miles Davis Kind of Blue.',
+    category: 'Music & Hobbies',
+    subcategory: 'Vinyl',
+    amount: 4200,
+    currency: 'INR',
+    expenseType: 'Expense',
+    location: { city: 'Bangalore', locationName: 'The Revolver Club Record Fair' },
+    metadata: { merchant: 'The Revolver Club', records: 'Abbey Road, Kind of Blue', format: '12" Vinyl' },
+    tags: ['music', 'vinyl', 'analog', 'audio', 'user-created'],
+  },
+  {
+    id: 'user-receipt-03',
+    type: 'event',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-12-10T06:30:00.000Z',
+    title: 'Morning 10K Run along Marine Drive',
+    description: 'Sunrise training run from Nariman Point to Chowpatty and back.',
+    category: 'Fitness',
+    location: { city: 'Mumbai', locationName: 'Marine Drive Promenade' },
+    metadata: { distance: '10.2 km', duration: '54m 12s', pace: '5:18 /km' },
+    tags: ['fitness', 'running', 'morning', 'mumbai', 'user-created'],
+  },
+  {
+    id: 'user-receipt-04',
+    type: 'transaction',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-01-20T11:15:00.000Z',
+    title: 'Flight Ticket to Kochi-Muziris Biennale',
+    description: 'Round-trip flight booking to Kochi for the art biennale weekend.',
+    category: 'Travel',
+    subcategory: 'Flights',
+    amount: 5600,
+    currency: 'INR',
+    location: { city: 'Kochi', locationName: 'Cochin International Airport' },
+    metadata: { merchant: 'IndiGo Airlines', pnr: '6E-481', seat: '14A' },
+    tags: ['travel', 'art', 'biennale', 'flight', 'user-created'],
+  },
+  {
+    id: 'user-receipt-05',
+    type: 'transaction',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2022-07-18T14:20:00.000Z',
+    title: 'Custom Mechanical Keyboard (Keychron K2)',
+    description: 'Wireless mechanical keyboard with Gateron brown switches for the creative studio.',
+    category: 'Electronics',
+    subcategory: 'Hardware',
+    amount: 8999,
+    currency: 'INR',
+    location: { city: 'Bangalore', locationName: 'Keychron India' },
+    metadata: { merchant: 'Keychron India', model: 'K2 v2 RGB Aluminum', switches: 'Gateron Brown' },
+    tags: ['tech', 'workspace', 'hardware', 'setup', 'user-created'],
+  },
+  {
+    id: 'user-receipt-06',
+    type: 'event',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2024-02-17T15:00:00.000Z',
+    title: 'Weekend Pottery Workshop with Maya',
+    description: 'Wheel-throwing and clay shaping class. Made two hand-thrown ceramic espresso cups.',
+    category: 'Workshop',
+    amount: 2500,
+    currency: 'INR',
+    location: { city: 'Bangalore', locationName: 'Clay Station Studio' },
+    metadata: { instructor: 'Clay Station', attendees: 2, itemsMade: 2 },
+    tags: ['workshop', 'art', 'weekend', 'pottery', 'user-created'],
+  },
+  {
+    id: 'user-receipt-07',
+    type: 'expense',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-02-12T10:15:00.000Z',
+    title: 'Pour-Over Coffee & Almond Croissant',
+    description: 'Morning coffee ritual following Sunday journaling session.',
+    category: 'Coffee',
+    subcategory: 'Cafe',
+    amount: 480,
+    currency: 'INR',
+    expenseType: 'Expense',
+    location: { city: 'Bangalore', locationName: 'Blue Tokai Cafe Indiranagar' },
+    metadata: { merchant: 'Blue Tokai', roast: 'Attikan Estate', brewMethod: 'V60' },
+    tags: ['coffee', 'reading', 'weekend', 'cafe', 'user-created'],
+  },
+  {
+    id: 'user-receipt-08',
+    type: 'place',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-10-28T17:30:00.000Z',
+    title: 'Sunset at Fort Kochi Promenade',
+    description: 'Watched Chinese fishing nets against the sunset after gallery visits.',
+    category: 'Place',
+    location: { city: 'Kochi', locationName: 'Fort Kochi Beach Promenade' },
+    metadata: { placeName: 'Fort Kochi Promenade', weather: 'Clear / Golden hour' },
+    tags: ['travel', 'heritage', 'sunset', 'kochi', 'user-created'],
+  },
+  {
+    id: 'user-receipt-09',
+    type: 'note',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-06-21T22:10:00.000Z',
+    title: 'Midnight Solstice Reading Notes',
+    description: 'Excerpts from Calvino’s Invisible Cities and thoughts on personal memory architectures.',
+    category: 'Literature',
+    location: { city: 'Bangalore', locationName: 'Home Library' },
+    metadata: { book: 'Invisible Cities', author: 'Italo Calvino', noteType: 'Archival Reflection' },
+    tags: ['reading', 'literature', 'reflection', 'note', 'user-created'],
+  },
+  {
+    id: 'user-receipt-10',
+    type: 'movie',
+    source: 'user',
+    provenance: 'user-created',
+    timestamp: '2023-07-22T19:30:00.000Z',
+    title: 'Oppenheimer 70mm IMAX Screening',
+    description: 'Opening weekend 70mm screening at PVR IMAX with friends.',
+    category: 'Cinema',
+    subcategory: 'Film',
+    amount: 850,
+    currency: 'INR',
+    location: { city: 'Bangalore', locationName: 'PVR IMAX Vega City' },
+    metadata: { director: 'Christopher Nolan', format: 'IMAX 70mm', screen: 'Audi 1' },
+    tags: ['movie', 'cinema', 'imax', 'entertainment', 'user-created'],
+  },
+];
+
+export const DEFAULT_DIARY_ENTRIES: DiaryEntry[] = [
+  {
+    id: 'diary-01',
+    title: 'Reflecting on the 2017 Monsoon Sessions',
+    content: "Revisiting old playlist logs from the 2017 monsoon. It’s wild how certain tracks bring back the exact damp scent of the campus library, the flickering tube lights, and late-night coding sprints. Music truly acts as an emotional index for memory.",
+    timestamp: '2023-08-20T21:30:00.000Z',
+    createdAt: '2023-08-20T21:30:00.000Z',
+    updatedAt: '2023-08-20T21:30:00.000Z',
+    linkedReceiptIds: ['user-receipt-02', 'user-receipt-09'],
+    tags: ['music', 'nostalgia', 'monsoon', 'reflection'],
+    mood: 'Reflective',
+  },
+  {
+    id: 'diary-02',
+    title: 'Setting up the New Creative Studio',
+    content: "Finally finished assembling the walnut desk and hooked up the vintage speakers and mechanical keyboard. Playing Miles Davis' 'Kind of Blue' on vinyl right now. Everything feels tactile, grounded, and focused.",
+    timestamp: '2023-09-05T19:00:00.000Z',
+    createdAt: '2023-09-05T19:00:00.000Z',
+    updatedAt: '2023-09-05T19:00:00.000Z',
+    linkedReceiptIds: ['user-receipt-02', 'user-receipt-05'],
+    tags: ['studio', 'music', 'workspace', 'focus'],
+    mood: 'Peaceful',
+  },
+  {
+    id: 'diary-03',
+    title: 'Post-Marathon Marine Drive Morning',
+    content: "Completed the 10K at sunrise. The breeze off the Arabian Sea was crisp. Sitting at a promenade cafe with black coffee and looking at the sea. Grateful for the rhythm of the city and consistent training.",
+    timestamp: '2023-12-10T10:15:00.000Z',
+    createdAt: '2023-12-10T10:15:00.000Z',
+    updatedAt: '2023-12-10T10:15:00.000Z',
+    linkedReceiptIds: ['user-receipt-03'],
+    tags: ['fitness', 'running', 'mumbai', 'morning'],
+    mood: 'Energized',
+  },
+  {
+    id: 'diary-04',
+    title: 'Biennale Wanderings in Fort Kochi',
+    content: "Spent 7 hours walking through Aspinwall House and pepper warehouses turned into art installations. The contrast between ancient spice docks and contemporary video art is mesmerizing. Finished the evening watching fishing nets dip into the sunset.",
+    timestamp: '2023-01-21T20:00:00.000Z',
+    createdAt: '2023-01-21T20:00:00.000Z',
+    updatedAt: '2023-01-21T20:00:00.000Z',
+    linkedReceiptIds: ['user-receipt-04', 'user-receipt-08'],
+    tags: ['art', 'travel', 'kochi', 'culture'],
+    mood: 'Inspired',
+  },
+];
+
+export const DEFAULT_BOOKMARKS: BookmarkItem[] = [
+  {
+    id: 'bookmark-01',
+    targetId: 'user-receipt-01',
+    targetType: 'receipt',
+    title: 'Anniversary Dinner at Olive Beach',
+    subtitle: 'Dining • 14 Nov 2023',
+    createdAt: '2023-11-15T09:00:00.000Z',
+    note: 'One of our all-time favorite meals. The grilled sea bass was unforgettable.',
+  },
+  {
+    id: 'bookmark-02',
+    targetId: 'user-receipt-02',
+    targetType: 'receipt',
+    title: 'Vinyl Record Haul — Abbey Road & Kind of Blue',
+    subtitle: 'Music & Hobbies • 03 Sep 2023',
+    createdAt: '2023-09-04T12:00:00.000Z',
+    note: 'Essential analog additions to the home sound library.',
+  },
+  {
+    id: 'bookmark-03',
+    targetId: 'user-receipt-06',
+    targetType: 'receipt',
+    title: 'Weekend Pottery Workshop with Maya',
+    subtitle: 'Workshop • 17 Feb 2024',
+    createdAt: '2024-02-18T10:00:00.000Z',
+    note: 'Handmade two ceramic espresso cups. First time on the wheel!',
+  },
+  {
+    id: 'bookmark-04',
+    targetId: 'user-receipt-10',
+    targetType: 'receipt',
+    title: 'Oppenheimer 70mm IMAX Screening',
+    subtitle: 'Cinema • 22 Jul 2023',
+    createdAt: '2023-07-23T11:00:00.000Z',
+    note: 'A masterclass in sound design and non-linear pacing.',
+  },
+];
+
+export const DEFAULT_FEATURED: FeaturedItem[] = [
+  {
+    id: 'featured-01',
+    receiptId: 'user-receipt-01',
+    createdAt: '2023-11-15T00:00:00.000Z',
+    caption: 'Our 5th anniversary dinner at Olive Beach under the courtyard banyan tree.',
+    order: 0,
+  },
+  {
+    id: 'featured-02',
+    receiptId: 'user-receipt-02',
+    createdAt: '2023-09-04T00:00:00.000Z',
+    caption: 'Finding pristine 180g analog pressings of Abbey Road and Miles Davis.',
+    order: 1,
+  },
+  {
+    id: 'featured-03',
+    receiptId: 'user-receipt-04',
+    createdAt: '2023-01-22T00:00:00.000Z',
+    caption: 'Art exploration and heritage warehouse walks at Kochi-Muziris Biennale.',
+    order: 2,
+  },
+  {
+    id: 'featured-04',
+    receiptId: 'user-receipt-03',
+    createdAt: '2023-12-11T00:00:00.000Z',
+    caption: '10K sunrise run along the Arabian Sea at Marine Drive.',
+    order: 3,
+  },
+];
+
+export const DEFAULT_FUTURE_EVENTS: FutureEvent[] = [
+  {
+    id: 'future-01',
+    title: 'Quarterly Archival Audit & Cold Backup',
+    date: '2026-10-15',
+    time: '10:00',
+    location: 'Home Studio',
+    category: 'Archival',
+    type: 'milestone',
+    notes: 'Export LifeTrace receipts, synchronize diary entries, and backup to encrypted cold storage.',
+    status: 'future',
+    createdAt: '2026-01-05T00:00:00.000Z',
+  },
+  {
+    id: 'future-02',
+    title: 'Tokyo Cherry Blossom & Jazz Kissatten Tour',
+    date: '2027-04-02',
+    time: '09:00',
+    location: 'Tokyo, Japan',
+    category: 'Travel',
+    type: 'travel',
+    notes: 'Exploring historical vinyl kissaten bars in Shibuya, Shinjuku, and Shimokitazawa.',
+    status: 'future',
+    createdAt: '2026-01-05T00:00:00.000Z',
+  },
+  {
+    id: 'future-03',
+    title: 'City Half Marathon 2026',
+    date: '2026-11-22',
+    time: '05:30',
+    location: 'Cubbon Park, Bangalore',
+    category: 'Fitness',
+    type: 'event',
+    notes: 'Target pace: under 5:15 min/km for 21.1 km.',
+    status: 'future',
+    createdAt: '2026-01-05T00:00:00.000Z',
+  },
+  {
+    id: 'future-04',
+    title: 'Acoustic Guitar Fingerstyle Masterclass',
+    date: '2026-12-05',
+    time: '14:00',
+    location: 'Alliance Française',
+    category: 'Music',
+    type: 'event',
+    notes: 'Special weekend masterclass on DADGAD tuning and Celtic harmonics.',
+    status: 'future',
+    createdAt: '2026-01-05T00:00:00.000Z',
+  },
+];
+
+export const DEFAULT_SAVED_VIEWS: SavedView[] = [
+  {
+    id: 'saved-view-01',
+    name: 'Late-Night Soundtracks & Memories',
+    type: 'explore',
+    filters: { types: ['music'], search: 'late night' },
+    createdAt: '2026-01-10T00:00:00.000Z',
+  },
+  {
+    id: 'saved-view-02',
+    name: 'The Convergence (2015–2018)',
+    type: 'journey',
+    filters: { dateRange: ['2015-01-01T00:00:00Z', '2018-12-31T23:59:59Z'] },
+    createdAt: '2026-01-10T00:00:00.000Z',
+  },
+  {
+    id: 'saved-view-03',
+    name: 'Personal Life Milestones',
+    type: 'explore',
+    filters: { sources: ['user', 'synthetic'] },
+    createdAt: '2026-01-10T00:00:00.000Z',
+  },
+];
+
+export function hasAnyUserData(): boolean {
+  return (
+    safeGetItem(STORAGE_KEYS.USER_RECEIPTS) !== null ||
+    safeGetItem(STORAGE_KEYS.DIARY) !== null ||
+    safeGetItem(STORAGE_KEYS.BOOKMARKS) !== null ||
+    safeGetItem(STORAGE_KEYS.FEATURED) !== null ||
+    safeGetItem(STORAGE_KEYS.FUTURE_EVENTS) !== null ||
+    safeGetItem(STORAGE_KEYS.SAVED_VIEWS) !== null
+  );
+}
+
+export function seedSampleUserData(force = false): void {
+  if (force || safeGetItem(STORAGE_KEYS.USER_RECEIPTS) === null) {
+    safeSetItem(STORAGE_KEYS.USER_RECEIPTS, JSON.stringify(DEFAULT_USER_RECEIPTS));
+    notifyChange(STORAGE_KEYS.USER_RECEIPTS);
+  }
+  if (force || safeGetItem(STORAGE_KEYS.DIARY) === null) {
+    safeSetItem(STORAGE_KEYS.DIARY, JSON.stringify(DEFAULT_DIARY_ENTRIES));
+    notifyChange(STORAGE_KEYS.DIARY);
+  }
+  if (force || safeGetItem(STORAGE_KEYS.BOOKMARKS) === null) {
+    safeSetItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(DEFAULT_BOOKMARKS));
+    notifyChange(STORAGE_KEYS.BOOKMARKS);
+  }
+  if (force || safeGetItem(STORAGE_KEYS.FEATURED) === null) {
+    safeSetItem(STORAGE_KEYS.FEATURED, JSON.stringify(DEFAULT_FEATURED));
+    notifyChange(STORAGE_KEYS.FEATURED);
+  }
+  if (force || safeGetItem(STORAGE_KEYS.FUTURE_EVENTS) === null) {
+    safeSetItem(STORAGE_KEYS.FUTURE_EVENTS, JSON.stringify(DEFAULT_FUTURE_EVENTS));
+    notifyChange(STORAGE_KEYS.FUTURE_EVENTS);
+  }
+  if (force || safeGetItem(STORAGE_KEYS.SAVED_VIEWS) === null) {
+    safeSetItem(STORAGE_KEYS.SAVED_VIEWS, JSON.stringify(DEFAULT_SAVED_VIEWS));
+    notifyChange(STORAGE_KEYS.SAVED_VIEWS);
+  }
+}
+
+export function resetSampleUserData(): void {
+  seedSampleUserData(true);
+}
+
+export function initSampleUserData(): void {
+  if (!hasAnyUserData()) {
+    seedSampleUserData(false);
+  }
+}

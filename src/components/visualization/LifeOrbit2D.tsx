@@ -16,6 +16,9 @@ export default function LifeOrbit2D({ chapters, selectedChapterId, onNodeSelect,
 
   const visibleChapters = useMemo(() => {
     if (!filterSource) return chapters;
+    if (filterSource === 'synthetic') {
+      return chapters.filter(c => c.dominantSource === 'synthetic' || c.receipts.some(r => r.source === 'synthetic'));
+    }
     return chapters.filter(c => c.dominantSource === filterSource);
   }, [chapters, filterSource]);
 
@@ -28,8 +31,15 @@ export default function LifeOrbit2D({ chapters, selectedChapterId, onNodeSelect,
       let cx = width / 2;
       let cy = height / 2;
       
-      if (chapter.dominantType === 'music') {
-        cx = width * 0.25; cy = height * 0.3;
+      if (
+        chapter.dominantSource === 'synthetic' ||
+        chapter.dominantType === 'place' ||
+        chapter.dominantType === 'event' ||
+        chapter.receipts.some(r => r.source === 'synthetic')
+      ) {
+        cx = width * 0.5; cy = height * 0.18;
+      } else if (chapter.dominantType === 'music') {
+        cx = width * 0.25; cy = height * 0.35;
       } else if (chapter.dominantType === 'expense') {
         cx = width * 0.25; cy = height * 0.7;
       } else if (chapter.dominantType === 'transaction') {
@@ -64,6 +74,7 @@ export default function LifeOrbit2D({ chapters, selectedChapterId, onNodeSelect,
             <text x="200" y="100">Music</text>
             <text x="200" y="550">Expenses</text>
             <text x="600" y="300">Transactions</text>
+            <text x="400" y="70">Synthetic Scenarios</text>
           </g>
         )}
 

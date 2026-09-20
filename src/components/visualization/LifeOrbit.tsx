@@ -18,6 +18,7 @@ const DOMAIN_CENTERS = {
   music: new THREE.Vector3(-3.8, 2.0, 0),
   expense: new THREE.Vector3(-3.2, -2.4, 0),
   transaction: new THREE.Vector3(4.0, 0.0, 0),
+  synthetic: new THREE.Vector3(0.0, 3.4, 0),
   core: new THREE.Vector3(0, 0, 0),
 };
 
@@ -26,6 +27,7 @@ const OrbitalRings = () => {
   const ringObjects = useMemo(() => {
     return [
       { radius: 3.0, color: '#C4622D', opacity: 0.25 }, // Music track
+      { radius: 4.2, color: '#7B4B94', opacity: 0.35 }, // Synthetic scenarios track
       { radius: 5.0, color: '#8B6914', opacity: 0.4 },  // The Convergence track
       { radius: 7.0, color: '#2B4B6F', opacity: 0.25 }, // Transactions track
     ].map((ring) => {
@@ -57,6 +59,7 @@ const ConstellationLines = () => {
       [DOMAIN_CENTERS.core, DOMAIN_CENTERS.music],
       [DOMAIN_CENTERS.core, DOMAIN_CENTERS.expense],
       [DOMAIN_CENTERS.core, DOMAIN_CENTERS.transaction],
+      [DOMAIN_CENTERS.core, DOMAIN_CENTERS.synthetic],
       [DOMAIN_CENTERS.music, DOMAIN_CENTERS.expense], // Convergence bridge
     ].map(([start, end]) => {
       const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
@@ -78,7 +81,7 @@ const ConstellationLines = () => {
 const AmbientMoments = ({ count = 48 }: { count?: number }) => {
   const particles = useMemo(() => {
     const arr = [];
-    const colors = ['#C4622D', '#3D5A47', '#2B4B6F', '#8B6914'];
+    const colors = ['#C4622D', '#3D5A47', '#2B4B6F', '#8B6914', '#7B4B94'];
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (i % 3);
       const radius = 2.0 + (i % 5) * 1.0;
@@ -179,6 +182,11 @@ const LifeOrbitScene = ({
 
   const visibleChapters = useMemo(() => {
     if (!filterSource) return chapters;
+    if (filterSource === 'synthetic') {
+      return chapters.filter(
+        (c) => c.dominantSource === 'synthetic' || c.receipts.some((r) => r.source === 'synthetic')
+      );
+    }
     return chapters.filter((c) => c.dominantSource === filterSource);
   }, [chapters, filterSource]);
 
@@ -186,9 +194,20 @@ const LifeOrbitScene = ({
   const nodes = useMemo(() => {
     return visibleChapters.map((chapter, i) => {
       let center = DOMAIN_CENTERS.core;
-      if (chapter.dominantType === 'music') center = DOMAIN_CENTERS.music;
-      else if (chapter.dominantType === 'expense') center = DOMAIN_CENTERS.expense;
-      else if (chapter.dominantType === 'transaction') center = DOMAIN_CENTERS.transaction;
+      if (
+        chapter.dominantSource === 'synthetic' ||
+        chapter.dominantType === 'place' ||
+        chapter.dominantType === 'event' ||
+        chapter.receipts.some((r) => r.source === 'synthetic')
+      ) {
+        center = DOMAIN_CENTERS.synthetic;
+      } else if (chapter.dominantType === 'music') {
+        center = DOMAIN_CENTERS.music;
+      } else if (chapter.dominantType === 'expense') {
+        center = DOMAIN_CENTERS.expense;
+      } else if (chapter.dominantType === 'transaction') {
+        center = DOMAIN_CENTERS.transaction;
+      }
 
       const isConvergence =
         chapter.dateRange[0].includes('2015') ||
@@ -253,6 +272,11 @@ const LifeOrbitScene = ({
       <Html position={[4.0, 1.4, 0]} center style={{ pointerEvents: 'none' }}>
         <div className="bg-navy-100/90 border border-navy-500/40 px-2 py-0.5 rounded text-[10px] font-mono text-navy-700 uppercase tracking-widest whitespace-nowrap shadow-xs">
           ✦ Transactions Domain
+        </div>
+      </Html>
+      <Html position={[0.0, 4.4, 0]} center style={{ pointerEvents: 'none' }}>
+        <div className="bg-purple-100/90 border border-purple-500/40 px-2 py-0.5 rounded text-[10px] font-mono text-purple-800 uppercase tracking-widest whitespace-nowrap shadow-xs">
+          ✦ Synthetic Scenarios Domain
         </div>
       </Html>
 
