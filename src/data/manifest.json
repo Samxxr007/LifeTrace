@@ -1,0 +1,28 @@
+{
+  "generated": "2026-09-20T06:18:04.951Z",
+  "datasets": {
+    "spotify": {
+      "sample": 8000,
+      "total": 105872,
+      "dateRange": {
+        "start": "2013-07-07T21:15:37.000Z",
+        "end": "2024-12-15T17:36:03.000Z"
+      }
+    },
+    "household": {
+      "total": 2461,
+      "dateRange": {
+        "start": "2018-09-20T06:34:08.000Z",
+        "end": "2014-12-31T18:30:00.000Z"
+      }
+    },
+    "transactions": {
+      "total": 9417,
+      "dateRange": {
+        "start": "2023-12-25T19:25:00.000Z",
+        "end": "2022-09-01T12:51:00.000Z"
+      }
+    }
+  },
+  "totalRecords": 117750
+}

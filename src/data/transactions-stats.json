@@ -1,0 +1,77 @@
+{
+  "totalRecords": 9417,
+  "totalSpent": 45169069.33999935,
+  "topCategories": [
+    {
+      "name": "Online Shopping",
+      "count": 2367,
+      "total": 10698394
+    },
+    {
+      "name": "Travel",
+      "count": 2238,
+      "total": 11306900
+    },
+    {
+      "name": "Entertainment",
+      "count": 2163,
+      "total": 10464405
+    },
+    {
+      "name": "Fitness And Medical",
+      "count": 1907,
+      "total": 8987340
+    },
+    {
+      "name": "Other",
+      "count": 742,
+      "total": 3712029
+    }
+  ],
+  "topCities": [
+    {
+      "name": "Aurangabad",
+      "count": 93
+    },
+    {
+      "name": "Kharagpur",
+      "count": 78
+    },
+    {
+      "name": "Nagpur",
+      "count": 67
+    },
+    {
+      "name": "Nizamabad",
+      "count": 65
+    },
+    {
+      "name": "Ghaziabad",
+      "count": 65
+    },
+    {
+      "name": "Satna",
+      "count": 65
+    },
+    {
+      "name": "Orai",
+      "count": 64
+    },
+    {
+      "name": "Berhampur",
+      "count": 63
+    },
+    {
+      "name": "Jhansi",
+      "count": 60
+    },
+    {
+      "name": "Akola",
+      "count": 60
+    }
+  ],
+  "dateRange": {
+    "start": "2023-12-25T19:25:00.000Z",
+    "end": "2022-09-01T12:51:00.000Z"
+  }
+}

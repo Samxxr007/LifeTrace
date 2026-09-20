@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg-base: #F5F0E8;
+    --color-bg-surface: #EDEBE3;
+    --color-text-primary: #1A1814;
+    --color-text-secondary: #4A4640;
+    --color-text-muted: #8A8480;
+    --color-border: #D5D0C8;
+    --color-music: #C4622D;
+    --color-expense: #3D5A47;
+    --color-transaction: #2B4B6F;
+    --color-connection: #8B6914;
+    --color-story: #8B3A3A;
+    --color-synthetic: #6B5A8A;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-parchment-100 text-ink-900 font-body;
+    min-height: 100dvh;
+  }
+
+  /* Skip link */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 
+           focus:z-50 focus:px-4 focus:py-2 focus:bg-ink-900 focus:text-parchment-100
+           focus:rounded focus:text-sm focus:font-body focus:no-underline;
+  }
+
+  /* Visible focus ring — never hidden */
+  *:focus-visible {
+    outline: 3px solid var(--color-text-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Scrollbar — subtle */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--color-bg-surface); }
+  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+  /* Typography */
+  h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; }
+
+  /* Selection color */
+  ::selection {
+    background-color: #C4622D;
+    color: #FAF7F0;
+  }
+}
+
+@layer components {
+  /* Divider — editorial hairline */
+  .divider {
+    @apply border-0 border-t border-ink-300 my-8;
+  }
+
+  /* Overline label — uppercase small */
+  .overline {
+    @apply text-label font-mono font-medium uppercase tracking-widest text-ink-500;
+  }
+
+  /* Editorial large number display */
+  .stat-number {
+    @apply font-mono text-4xl font-medium text-ink-900 leading-none;
+  }
+
+  /* Receipt type colors */
+  .type-music       { color: var(--color-music); }
+  .type-expense     { color: var(--color-expense); }
+  .type-transaction { color: var(--color-transaction); }
+  .type-connection  { color: var(--color-connection); }
+  .type-synthetic   { color: var(--color-synthetic); }
+
+  .bg-type-music       { background-color: #FBE8DC; }
+  .bg-type-expense     { background-color: #DCE8E0; }
+  .bg-type-transaction { background-color: #DCE5EF; }
+  .bg-type-connection  { background-color: #F5EDCC; }
+  .bg-type-synthetic   { background-color: #E8E3F0; }
+}
