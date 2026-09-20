@@ -134,7 +134,7 @@ function processSpotify() {
     buckets[key].push(r);
   }
 
-  const TARGET = 8000;
+  const TARGET = 1500;
   const bucketKeys = Object.keys(buckets);
   const perBucket = Math.max(1, Math.ceil(TARGET / bucketKeys.length));
   
@@ -333,7 +333,12 @@ function processHousehold() {
   console.log(`   Total spent: ₹${Math.round(stats.totalSpent).toLocaleString()}`);
   console.log(`   Top category: ${topCategories[0]?.name} (${topCategories[0]?.count} records)`);
 
-  return { records, stats };
+  // Sample to 1000 records for fast client-side performance
+  const sampledRecords = records.length > 1000 
+    ? records.filter((_, idx) => idx % Math.ceil(records.length / 1000) === 0).slice(0, 1000)
+    : records;
+
+  return { records: sampledRecords, stats };
 }
 
 // ─── Financial Transactions Processing ────────────────────────────────────────
@@ -437,7 +442,12 @@ function processTransactions() {
   console.log(`   Total spent: ₹${Math.round(stats.totalSpent).toLocaleString()}`);
   console.log(`   Top category: ${topCategories[0]?.name}`);
 
-  return { records, stats };
+  // Sample to 1000 records for fast client-side performance
+  const sampledRecords = records.length > 1000
+    ? records.filter((_, idx) => idx % Math.ceil(records.length / 1000) === 0).slice(0, 1000)
+    : records;
+
+  return { records: sampledRecords, stats };
 }
 
 // ─── Main ──────────────────────────────────────────────────────────────────────

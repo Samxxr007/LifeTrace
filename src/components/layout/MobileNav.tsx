@@ -1,14 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Route, Compass, Search, Menu } from 'lucide-react';
+import { Route, Compass, Search, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function MobileNav() {
   const items = [
-    { label: 'Journey', path: '/journey', icon: Route, activeColor: 'text-ink-900' },
-    { label: 'Discover', path: '/discover', icon: Compass, activeColor: 'text-forest-600' },
+    { label: 'Home', path: '/', icon: Compass, activeColor: 'text-ink-900' },
+    { label: 'Journey', path: '/journey', icon: Route, activeColor: 'text-burnt-600' },
+    { label: 'Discover', path: '/discover', icon: Sparkles, activeColor: 'text-forest-600' },
     { label: 'Explore', path: '/explore', icon: Search, activeColor: 'text-navy-600' },
-    { label: 'Menu', path: '/menu', icon: Menu, activeColor: 'text-ink-900' },
   ];
 
   return (
