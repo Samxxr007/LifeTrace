@@ -299,10 +299,11 @@ export function FutureEventsView({ onSelectReceipt: _onSelectReceipt }: FutureEv
       >
         <form onSubmit={handleSubmit} className="space-y-4 font-body text-ink-900">
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="future-event-title" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Event Title *
             </label>
             <input
+              id="future-event-title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -314,10 +315,11 @@ export function FutureEventsView({ onSelectReceipt: _onSelectReceipt }: FutureEv
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+              <label htmlFor="future-event-date" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
                 Date *
               </label>
               <input
+                id="future-event-date"
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
@@ -326,10 +328,11 @@ export function FutureEventsView({ onSelectReceipt: _onSelectReceipt }: FutureEv
               />
             </div>
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+              <label htmlFor="future-event-time" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
                 Time (optional)
               </label>
               <input
+                id="future-event-time"
                 type="text"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
@@ -341,10 +344,11 @@ export function FutureEventsView({ onSelectReceipt: _onSelectReceipt }: FutureEv
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+              <label htmlFor="future-event-type" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
                 Event Type
               </label>
               <select
+                id="future-event-type"
                 value={type}
                 onChange={(e) => setType(e.target.value as FutureEvent['type'])}
                 className="w-full px-3 py-1.5 bg-parchment-50 border border-ink-300 rounded-sm text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-ink-900"
@@ -357,10 +361,11 @@ export function FutureEventsView({ onSelectReceipt: _onSelectReceipt }: FutureEv
               </select>
             </div>
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+              <label htmlFor="future-event-category" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
                 Category
               </label>
               <input
+                id="future-event-category"
                 type="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -371,10 +376,11 @@ export function FutureEventsView({ onSelectReceipt: _onSelectReceipt }: FutureEv
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="future-event-location" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Location / Venue (optional)
             </label>
             <input
+              id="future-event-location"
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
@@ -384,10 +390,11 @@ export function FutureEventsView({ onSelectReceipt: _onSelectReceipt }: FutureEv
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="future-event-notes" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Notes & Preparations
             </label>
             <textarea
+              id="future-event-notes"
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

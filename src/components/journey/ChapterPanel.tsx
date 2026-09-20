@@ -10,27 +10,75 @@ interface ChapterPanelProps {
 }
 
 export default function ChapterPanel({ chapter, onClose, onExploreChapter }: ChapterPanelProps) {
-  
-  // Close on Escape
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const previousFocusRef = React.useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && chapter && panelRef.current) {
+        const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement || document.activeElement === panelRef.current) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+
+    let timer: any = null;
+    if (chapter) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      window.addEventListener('keydown', handleKeyDown);
+      timer = setTimeout(() => {
+        const closeBtn = panelRef.current?.querySelector<HTMLElement>('button[aria-label="Close panel"]');
+        if (closeBtn) closeBtn.focus();
+        else panelRef.current?.focus();
+      }, 15);
+    } else {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+      }
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [chapter, onClose]);
 
   return (
     <AnimatePresence>
       {chapter && (
         <motion.div
+          ref={panelRef}
           initial={{ x: '100%', opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed top-0 right-0 w-full md:w-[400px] h-full bg-parchment-100 border-l border-ink-300 shadow-2xl z-50 flex flex-col overflow-y-auto"
+          className="fixed top-0 right-0 w-full md:w-[400px] h-full bg-parchment-100 border-l border-ink-300 shadow-2xl z-50 flex flex-col overflow-y-auto outline-none"
           role="dialog"
+          aria-modal="true"
           aria-labelledby="chapter-title"
+          tabIndex={-1}
         >
           <div className="p-6 border-b border-ink-300 flex justify-between items-center sticky top-0 bg-parchment-100 z-10">
             <span className="text-label text-ink-500 tracking-widest">CHAPTER</span>

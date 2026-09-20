@@ -27,12 +27,14 @@ const USER_MOODS = [
   'Peaceful',
 ];
 
+const EMPTY_RECEIPT_IDS: string[] = [];
+
 export function DiaryModal({
   open,
   onClose,
   entryToEdit,
   initialDate,
-  initialReceiptIds = [],
+  initialReceiptIds = EMPTY_RECEIPT_IDS,
   allReceipts,
 }: DiaryModalProps) {
   const { addDiaryEntry } = useUserData();
@@ -49,6 +51,8 @@ export function DiaryModal({
   const [receiptSearch, setReceiptSearch] = useState('');
 
   useEffect(() => {
+    if (!open) return;
+
     if (entryToEdit) {
       setTitle(entryToEdit.title);
       setContent(entryToEdit.content);
@@ -136,10 +140,11 @@ export function DiaryModal({
       <form onSubmit={handleSubmit} className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
         {/* Title */}
         <div>
-          <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+          <label htmlFor="diary-title" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
             Entry Title *
           </label>
           <input
+            id="diary-title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -152,10 +157,11 @@ export function DiaryModal({
         {/* Date & Tags */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="diary-timestamp" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Date & Time *
             </label>
             <input
+              id="diary-timestamp"
               type="datetime-local"
               value={timestamp}
               onChange={(e) => setTimestamp(e.target.value)}
@@ -165,10 +171,11 @@ export function DiaryModal({
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="diary-tags" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Tags (comma-separated)
             </label>
             <input
+              id="diary-tags"
               type="text"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
@@ -220,8 +227,11 @@ export function DiaryModal({
             })}
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="text-[11px] font-mono text-ink-500 shrink-0">Or custom:</span>
+            <label htmlFor="diary-custom-mood" className="text-[11px] font-mono text-ink-500 shrink-0">
+              Or custom:
+            </label>
             <input
+              id="diary-custom-mood"
               type="text"
               value={USER_MOODS.includes(selectedMood || '') ? '' : selectedMood || ''}
               onChange={(e) => setSelectedMood(e.target.value.trim() ? e.target.value : undefined)}
@@ -233,10 +243,11 @@ export function DiaryModal({
 
         {/* Content */}
         <div>
-          <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+          <label htmlFor="diary-content" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
             Personal Reflection & Memory *
           </label>
           <textarea
+            id="diary-content"
             rows={5}
             value={content}
             onChange={(e) => setContent(e.target.value)}

@@ -21,18 +21,49 @@ export function Dialog({ open, onClose, title, description, children, size = 'md
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && open) {
         onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && open && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement || document.activeElement === dialogRef.current) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
+    let timer: any = null;
     if (open) {
       previousFocusRef.current = document.activeElement as HTMLElement;
       document.body.style.overflow = 'hidden';
       document.addEventListener('keydown', handleKeyDown);
       
-      // Simple focus trap: focus the dialog when opened
-      setTimeout(() => {
-        dialogRef.current?.focus();
-      }, 10);
+      // Focus the first focusable control inside the dialog, or dialog itself
+      timer = setTimeout(() => {
+        const firstInput = dialogRef.current?.querySelector<HTMLElement>(
+          'input:not([disabled]), textarea:not([disabled]), button:not([disabled])'
+        );
+        if (firstInput) {
+          firstInput.focus();
+        } else {
+          dialogRef.current?.focus();
+        }
+      }, 15);
     } else {
       document.body.style.overflow = '';
       document.removeEventListener('keydown', handleKeyDown);
@@ -42,6 +73,7 @@ export function Dialog({ open, onClose, title, description, children, size = 'md
     }
 
     return () => {
+      if (timer) clearTimeout(timer);
       document.body.style.overflow = '';
       document.removeEventListener('keydown', handleKeyDown);
     };

@@ -65,6 +65,9 @@ export const loadTransactionReceipts = (): LifeReceipt[] => {
 export { loadSyntheticReceipts } from '@/data/synthetic/scenarios';
 import { getUserReceipts } from '@/lib/storage';
 
+let cachedUnifiedReceipts: LifeReceipt[] | null = null;
+let lastUserReceiptsCount = -1;
+
 export const loadAllReceipts = (): LifeReceipt[] => {
   if (cachedAllReceipts) return cachedAllReceipts;
   const all = [
@@ -78,10 +81,18 @@ export const loadAllReceipts = (): LifeReceipt[] => {
 };
 
 export const loadUnifiedReceipts = (): LifeReceipt[] => {
-  const base = loadAllReceipts();
   const user = getUserReceipts();
-  if (user.length === 0) return base;
-  return [...base, ...user].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  if (cachedUnifiedReceipts && user.length === lastUserReceiptsCount) {
+    return cachedUnifiedReceipts;
+  }
+  const base = loadAllReceipts();
+  lastUserReceiptsCount = user.length;
+  if (user.length === 0) {
+    cachedUnifiedReceipts = base;
+    return cachedUnifiedReceipts;
+  }
+  cachedUnifiedReceipts = [...base, ...user].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  return cachedUnifiedReceipts;
 };
 
 export const loadSpotifyStats = (): SpotifyStats => {

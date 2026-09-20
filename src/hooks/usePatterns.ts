@@ -3,19 +3,28 @@ import { LifeReceipt, Pattern, SpotifyStats, HouseholdStats } from '@/types';
 import { detectPatterns } from '@/engine/patterns';
 
 export function usePatterns(receipts: LifeReceipt[], spotifyStats: SpotifyStats | null, householdStats: HouseholdStats | null) {
-  const [patterns, setPatterns] = useState<Pattern[]>([]);
+  const [patterns, setPatterns] = useState<Pattern[]>(() => {
+    return receipts.length > 0 ? detectPatterns(receipts, spotifyStats, householdStats) : [];
+  });
   const [isComputing, setIsComputing] = useState(false);
 
   useEffect(() => {
-    if (receipts.length === 0) return;
+    if (receipts.length === 0) {
+      setPatterns([]);
+      return;
+    }
+
+    const currentResult = detectPatterns(receipts, spotifyStats, householdStats);
+    if (patterns.length === currentResult.length && patterns.length > 0) {
+      return;
+    }
     
     let mounted = true;
     setIsComputing(true);
     
     const timer = setTimeout(() => {
-      const result = detectPatterns(receipts, spotifyStats, householdStats);
       if (mounted) {
-        setPatterns(result);
+        setPatterns(currentResult);
         setIsComputing(false);
       }
     }, 0);
@@ -24,7 +33,7 @@ export function usePatterns(receipts: LifeReceipt[], spotifyStats: SpotifyStats 
       mounted = false;
       clearTimeout(timer);
     };
-  }, [receipts, spotifyStats, householdStats]);
+  }, [receipts, spotifyStats, householdStats, patterns]);
 
   return { patterns, isComputing };
 }

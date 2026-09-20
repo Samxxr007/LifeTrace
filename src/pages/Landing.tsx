@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { FileText, Music, CreditCard, ArrowRight, Sparkles, Layers, Network, BookOpen, Compass } from 'lucide-react';
+import { FileText, Music, CreditCard, ArrowRight, Sparkles, Layers, Network, BookOpen, Compass, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLifeData } from '@/hooks/useLifeData';
 
 const Landing: React.FC = () => {
   const prefersReducedMotion = useReducedMotion();
   const [showLines, setShowLines] = useState(false);
+  const { manifest } = useLifeData();
 
   useEffect(() => {
     if (!prefersReducedMotion) {
@@ -15,6 +17,11 @@ const Landing: React.FC = () => {
       setShowLines(true);
     }
   }, [prefersReducedMotion]);
+
+  const totalRecordsDisplay = manifest?.totalRecords ? manifest.totalRecords.toLocaleString() : '162,588';
+  const spotifyRecordsDisplay = manifest?.datasets?.spotify?.total ? manifest.datasets.spotify.total.toLocaleString() : '149,860';
+  const householdRecordsDisplay = manifest?.datasets?.household?.total ? manifest.datasets.household.total.toLocaleString() : '2,461';
+  const transactionRecordsDisplay = manifest?.datasets?.transactions?.total ? manifest.datasets.transactions.total.toLocaleString() : '10,267';
 
   return (
     <div className="min-h-screen bg-parchment-100 font-sans text-ink-900 selection:bg-ink-200">
@@ -93,7 +100,7 @@ const Landing: React.FC = () => {
           </div>
 
           <p className="font-mono text-sm text-ink-500 mb-8 uppercase tracking-widest">
-            162,588 records across three datasets
+            {totalRecordsDisplay} records across three datasets
           </p>
 
           <div className="flex flex-wrap gap-4 justify-center">
@@ -134,105 +141,130 @@ const Landing: React.FC = () => {
             </p>
           </div>
 
-          {/* Explicit Transformation Flow: RAW DATA → INSIGHTS → CONNECTIONS → STORIES */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Explicit Transformation Flow: RAW DATA → INSIGHTS → CONNECTIONS → PATTERNS & STORIES → PERSONAL MEMORY & FUTURE */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* 1. Raw Receipts */}
             <Link
               to="/explore"
-              className="group p-6 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
+              className="group p-5 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700">
-                    <Layers size={18} />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-9 h-9 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700 group-hover:bg-ink-900 group-hover:text-parchment-100 transition-colors">
+                    <Layers size={16} />
                   </div>
                   <span className="font-mono text-xs text-ink-400">01</span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-ink-900 mb-2 group-hover:text-burnt-600 transition-colors">
+                <h3 className="font-display text-lg font-bold text-ink-900 mb-1.5 group-hover:text-burnt-600 transition-colors">
                   Raw Receipts
                 </h3>
-                <p className="font-body text-sm text-ink-600 leading-relaxed">
+                <p className="font-body text-xs text-ink-600 leading-relaxed">
                   Explore individual recorded moments across Music, Household and Financial datasets.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-ink-200 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
+              <div className="mt-5 pt-3 border-t border-ink-200 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
                 <span>Explore records</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={13} />
               </div>
             </Link>
 
             {/* 2. Insights */}
             <Link
               to="/journey"
-              className="group p-6 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
+              className="group p-5 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700">
-                    <Compass size={18} />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-9 h-9 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700 group-hover:bg-ink-900 group-hover:text-parchment-100 transition-colors">
+                    <Compass size={16} />
                   </div>
                   <span className="font-mono text-xs text-ink-400">02</span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-ink-900 mb-2 group-hover:text-burnt-600 transition-colors">
+                <h3 className="font-display text-lg font-bold text-ink-900 mb-1.5 group-hover:text-burnt-600 transition-colors">
                   Insights
                 </h3>
-                <p className="font-body text-sm text-ink-600 leading-relaxed">
+                <p className="font-body text-xs text-ink-600 leading-relaxed">
                   See aggregated activity, spending, listening and temporal patterns across 11 years.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-ink-200 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
+              <div className="mt-5 pt-3 border-t border-ink-200 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
                 <span>View Orbit</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={13} />
               </div>
             </Link>
 
             {/* 3. Connections */}
             <Link
               to="/discover?view=connections"
-              className="group p-6 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
+              className="group p-5 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700">
-                    <Network size={18} />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-9 h-9 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700 group-hover:bg-ink-900 group-hover:text-parchment-100 transition-colors">
+                    <Network size={16} />
                   </div>
                   <span className="font-mono text-xs text-ink-400">03</span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-ink-900 mb-2 group-hover:text-burnt-600 transition-colors">
+                <h3 className="font-display text-lg font-bold text-ink-900 mb-1.5 group-hover:text-burnt-600 transition-colors">
                   Connections
                 </h3>
-                <p className="font-body text-sm text-ink-600 leading-relaxed">
-                  Discover evidence-based relationships between recorded moments using temporal and category heuristics.
+                <p className="font-body text-xs text-ink-600 leading-relaxed">
+                  Discover evidence-based relationships between moments using temporal and category heuristics.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-ink-200 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
+              <div className="mt-5 pt-3 border-t border-ink-200 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
                 <span>View threads</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={13} />
               </div>
             </Link>
 
-            {/* 4. Stories */}
+            {/* 4. Patterns & Stories */}
             <Link
               to="/discover?view=stories"
-              className="group p-6 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
+              className="group p-5 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700">
-                    <BookOpen size={18} />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-9 h-9 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700 group-hover:bg-ink-900 group-hover:text-parchment-100 transition-colors">
+                    <BookOpen size={16} />
                   </div>
                   <span className="font-mono text-xs text-ink-400">04</span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-ink-900 mb-2 group-hover:text-burnt-600 transition-colors">
-                  Stories
+                <h3 className="font-display text-lg font-bold text-ink-900 mb-1.5 group-hover:text-burnt-600 transition-colors">
+                  Patterns & Stories
                 </h3>
-                <p className="font-body text-sm text-ink-600 leading-relaxed">
-                  Follow data-grounded chapters derived from observed patterns and real evidence.
+                <p className="font-body text-xs text-ink-600 leading-relaxed">
+                  Follow data-grounded chapters and recurring behavioral patterns derived from real evidence.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-ink-200 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
+              <div className="mt-5 pt-3 border-t border-ink-200 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
                 <span>Read chapters</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={13} />
+              </div>
+            </Link>
+
+            {/* 5. Personal Memory & Future */}
+            <Link
+              to="/mylife"
+              className="group p-5 bg-parchment-100 border border-ink-300 hover:border-ink-900 transition-all rounded-sm flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-9 h-9 rounded-full bg-parchment-200 flex items-center justify-center text-ink-700 group-hover:bg-ink-900 group-hover:text-parchment-100 transition-colors">
+                    <Sparkles size={16} />
+                  </div>
+                  <span className="font-mono text-xs text-ink-400">05</span>
+                </div>
+                <h3 className="font-display text-lg font-bold text-ink-900 mb-1.5 group-hover:text-burnt-600 transition-colors">
+                  Personal Memory
+                </h3>
+                <p className="font-body text-xs text-ink-600 leading-relaxed">
+                  Preserve private reflective memories, journal entries, future intentions, and curated bookmarks.
+                </p>
+              </div>
+              <div className="mt-5 pt-3 border-t border-ink-200 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-ink-500 group-hover:text-ink-900">
+                <span>Open My Life</span>
+                <ArrowRight size={13} />
               </div>
             </Link>
           </div>
@@ -260,7 +292,7 @@ const Landing: React.FC = () => {
               viewport={{ once: true }}
               className="border-t border-ink-400 pt-6"
             >
-              <div className="font-display text-4xl mb-2 text-ink-900">149,860</div>
+              <div className="font-display text-4xl mb-2 text-ink-900">{spotifyRecordsDisplay}</div>
               <div className="font-mono text-sm uppercase tracking-wider mb-4 text-burnt-700 font-semibold">
                 music moments
               </div>
@@ -279,7 +311,7 @@ const Landing: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="border-t border-ink-400 pt-6"
             >
-              <div className="font-display text-4xl mb-2 text-ink-900">2,461</div>
+              <div className="font-display text-4xl mb-2 text-ink-900">{householdRecordsDisplay}</div>
               <div className="font-mono text-sm uppercase tracking-wider mb-4 text-forest-700 font-semibold">
                 life receipts
               </div>
@@ -298,7 +330,7 @@ const Landing: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="border-t border-ink-400 pt-6"
             >
-              <div className="font-display text-4xl mb-2 text-ink-900">10,267</div>
+              <div className="font-display text-4xl mb-2 text-ink-900">{transactionRecordsDisplay}</div>
               <div className="font-mono text-sm uppercase tracking-wider mb-4 text-navy-700 font-semibold">
                 financial transactions
               </div>

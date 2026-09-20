@@ -348,7 +348,7 @@ export default function MyLife() {
         {/* DEEPER TABS SECTION */}
         <section className="space-y-6 pt-4">
           {/* Tabs Navigation */}
-          <div className="flex flex-wrap border-b border-ink-300 gap-1">
+          <div className="flex flex-wrap border-b border-ink-300 gap-1" role="tablist" aria-label="Archive sections">
             {[
               { id: 'diary', label: `Personal Diary (${diaryEntries.length})`, icon: BookOpen },
               { id: 'bookmarks', label: `Bookmarks (${bookmarks.length})`, icon: Bookmark },
@@ -361,8 +361,12 @@ export default function MyLife() {
               return (
                 <button
                   key={tab.id}
+                  id={`tab-${tab.id}`}
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id as MyLifeTab)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 font-mono text-xs uppercase tracking-wider border-b-2 transition-colors ${
+                  className={`flex items-center gap-1.5 px-4 py-2.5 font-mono text-xs uppercase tracking-wider border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 ${
                     isActive
                       ? 'border-ink-900 text-ink-900 font-bold bg-parchment-200/50'
                       : 'border-transparent text-ink-500 hover:text-ink-900'

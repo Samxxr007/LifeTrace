@@ -3,19 +3,28 @@ import { LifeReceipt, Connection, Chapter } from '@/types';
 import { buildChapters } from '@/engine/chapters';
 
 export function useChapters(receipts: LifeReceipt[], connections: Connection[]) {
-  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [chapters, setChapters] = useState<Chapter[]>(() => {
+    return receipts.length > 0 ? buildChapters(receipts, connections) : [];
+  });
   const [isComputing, setIsComputing] = useState(false);
 
   useEffect(() => {
-    if (receipts.length === 0) return;
+    if (receipts.length === 0) {
+      setChapters([]);
+      return;
+    }
+
+    const currentResult = buildChapters(receipts, connections);
+    if (chapters.length === currentResult.length && chapters.length > 0) {
+      return;
+    }
     
     let mounted = true;
     setIsComputing(true);
     
     const timer = setTimeout(() => {
-      const result = buildChapters(receipts, connections);
       if (mounted) {
-        setChapters(result);
+        setChapters(currentResult);
         setIsComputing(false);
       }
     }, 0);
@@ -24,7 +33,7 @@ export function useChapters(receipts: LifeReceipt[], connections: Connection[]) 
       mounted = false;
       clearTimeout(timer);
     };
-  }, [receipts, connections]);
+  }, [receipts, connections, chapters]);
 
   return { chapters, isComputing };
 }

@@ -1,7 +1,20 @@
 import { LifeReceipt, Connection, Chapter } from '@/types';
 
+let cachedChaptersReceiptsRef: LifeReceipt[] | null = null;
+let cachedChaptersReceiptsCount = -1;
+let cachedChaptersConnectionsCount = -1;
+let cachedChaptersResult: Chapter[] | null = null;
+
 export function buildChapters(receipts: LifeReceipt[], connections: Connection[]): Chapter[] {
-  if (!receipts.length) return [];
+  if (!receipts || !receipts.length) return [];
+
+  if (
+    cachedChaptersResult &&
+    (receipts === cachedChaptersReceiptsRef || receipts.length === cachedChaptersReceiptsCount) &&
+    connections.length === cachedChaptersConnectionsCount
+  ) {
+    return cachedChaptersResult;
+  }
   
   const sorted = [...receipts].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   
@@ -53,7 +66,12 @@ export function buildChapters(receipts: LifeReceipt[], connections: Connection[]
     chapters.push(finalizeChapter(currentChapter, connections));
   }
   
-  return chapters.sort((a, b) => new Date(a.dateRange[0]).getTime() - new Date(b.dateRange[0]).getTime());
+  const result = chapters.sort((a, b) => new Date(a.dateRange[0]).getTime() - new Date(b.dateRange[0]).getTime());
+  cachedChaptersReceiptsRef = receipts;
+  cachedChaptersReceiptsCount = receipts.length;
+  cachedChaptersConnectionsCount = connections.length;
+  cachedChaptersResult = result;
+  return result;
 }
 
 function initChapter(w: { start: number; end: number; receipts: LifeReceipt[] }): Chapter {

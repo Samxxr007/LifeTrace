@@ -1,5 +1,12 @@
 import { LifeReceipt, Connection, Pattern, Chapter, SpotifyStats, HouseholdStats, TransactionStats, LifeInsights } from '@/types';
 
+let cachedInsightsReceiptsRef: LifeReceipt[] | null = null;
+let cachedInsightsReceiptsCount = -1;
+let cachedInsightsConnectionsCount = -1;
+let cachedInsightsPatternsCount = -1;
+let cachedInsightsChaptersCount = -1;
+let cachedInsightsResult: LifeInsights | null = null;
+
 export function computeInsights(
   receipts: LifeReceipt[],
   connections: Connection[],
@@ -9,10 +16,18 @@ export function computeInsights(
   householdStats: HouseholdStats | null,
   transactionStats: TransactionStats | null
 ): LifeInsights {
-  const sorted = [...receipts].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-  
-  const dateRange: [string, string] = sorted.length > 0 
-    ? [sorted[0].timestamp, sorted[sorted.length - 1].timestamp] 
+  if (
+    cachedInsightsResult &&
+    (receipts === cachedInsightsReceiptsRef || receipts.length === cachedInsightsReceiptsCount) &&
+    connections.length === cachedInsightsConnectionsCount &&
+    patterns.length === cachedInsightsPatternsCount &&
+    chapters.length === cachedInsightsChaptersCount
+  ) {
+    return cachedInsightsResult;
+  }
+
+  const dateRange: [string, string] = receipts.length > 0 
+    ? [receipts[0].timestamp, receipts[receipts.length - 1].timestamp] 
     : [new Date().toISOString(), new Date().toISOString()];
     
   let spotifyTotal = 0;
@@ -53,7 +68,7 @@ export function computeInsights(
       peakActivityHour = spotifyStats.hourDistribution.indexOf(maxVal);
   }
   
-  return {
+  const result: LifeInsights = {
     totalRecords: receipts.length,
     spotifyTotal,
     householdTotal,
@@ -70,4 +85,13 @@ export function computeInsights(
     peakActivityHour,
     peakActivityDay: 0 // Simplification
   };
+
+  cachedInsightsReceiptsRef = receipts;
+  cachedInsightsReceiptsCount = receipts.length;
+  cachedInsightsConnectionsCount = connections.length;
+  cachedInsightsPatternsCount = patterns.length;
+  cachedInsightsChaptersCount = chapters.length;
+  cachedInsightsResult = result;
+
+  return result;
 }

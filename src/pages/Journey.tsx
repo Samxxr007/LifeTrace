@@ -69,7 +69,7 @@ export default function Journey() {
   };
 
   const handleExploreChapter = (id: string) => {
-    window.location.href = `/discover?view=stories&chapter=${id}`;
+    navigate(`/discover?view=stories&chapter=${id}`);
   };
 
   const selectedChapter = chapters.find((c) => c.id === selectedChapterId) || null;
@@ -88,9 +88,10 @@ export default function Journey() {
         </div>
 
         {/* Domain Filter Buttons */}
-        <div className="flex items-center space-x-1.5 sm:space-x-3 bg-parchment-200 p-1 rounded-sm border border-ink-300">
+        <div className="flex items-center space-x-1.5 sm:space-x-3 bg-parchment-200 p-1 rounded-sm border border-ink-300" role="group" aria-label="Filter domain">
           <button
             onClick={() => setFilterSource(null)}
+            aria-pressed={!filterSource}
             className={`px-3 py-1 font-mono text-xs tracking-wider rounded-sm transition-colors ${
               !filterSource ? 'bg-ink-900 text-parchment-100' : 'text-ink-600 hover:text-ink-900'
             }`}
@@ -99,6 +100,7 @@ export default function Journey() {
           </button>
           <button
             onClick={() => setFilterSource('spotify')}
+            aria-pressed={filterSource === 'spotify'}
             className={`px-3 py-1 font-mono text-xs tracking-wider rounded-sm transition-colors ${
               filterSource === 'spotify' ? 'bg-burnt-500 text-parchment-100' : 'text-ink-600 hover:text-burnt-700'
             }`}
@@ -107,6 +109,7 @@ export default function Journey() {
           </button>
           <button
             onClick={() => setFilterSource('household')}
+            aria-pressed={filterSource === 'household'}
             className={`px-3 py-1 font-mono text-xs tracking-wider rounded-sm transition-colors ${
               filterSource === 'household' ? 'bg-forest-500 text-parchment-100' : 'text-ink-600 hover:text-forest-700'
             }`}
@@ -115,6 +118,7 @@ export default function Journey() {
           </button>
           <button
             onClick={() => setFilterSource('transactions')}
+            aria-pressed={filterSource === 'transactions'}
             className={`px-3 py-1 font-mono text-xs tracking-wider rounded-sm transition-colors ${
               filterSource === 'transactions' ? 'bg-navy-500 text-parchment-100' : 'text-ink-600 hover:text-navy-700'
             }`}
@@ -123,6 +127,7 @@ export default function Journey() {
           </button>
           <button
             onClick={() => setFilterSource('synthetic')}
+            aria-pressed={filterSource === 'synthetic'}
             className={`px-3 py-1 font-mono text-xs tracking-wider rounded-sm transition-colors ${
               filterSource === 'synthetic' ? 'bg-purple-700 text-parchment-100 font-bold' : 'text-ink-600 hover:text-purple-800'
             }`}

@@ -72,11 +72,16 @@ export function SavedViewsMenu({
 
           {isSaving && (
             <form onSubmit={handleSave} className="p-1.5 bg-parchment-200/80 rounded-xs space-y-1.5">
+              <label htmlFor="saved-view-name" className="sr-only">
+                Saved view name
+              </label>
               <input
+                id="saved-view-name"
                 type="text"
                 value={viewName}
                 onChange={(e) => setViewName(e.target.value)}
                 placeholder="View name (e.g. 2017 Coffee & Music)"
+                aria-label="Saved view name"
                 className="w-full px-2 py-1 bg-parchment-50 border border-ink-300 rounded-xs text-xs text-ink-900 focus:outline-none focus:ring-1 focus:ring-ink-900"
                 autoFocus
               />

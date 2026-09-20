@@ -3,19 +3,28 @@ import { LifeReceipt, Connection } from '@/types';
 import { findConnections, getConnectionsForReceipt } from '@/engine/connections';
 
 export function useConnections(receipts: LifeReceipt[]) {
-  const [connections, setConnections] = useState<Connection[]>([]);
+  const [connections, setConnections] = useState<Connection[]>(() => {
+    return receipts.length > 0 ? findConnections(receipts) : [];
+  });
   const [isComputing, setIsComputing] = useState(false);
 
   useEffect(() => {
-    if (receipts.length === 0) return;
+    if (receipts.length === 0) {
+      setConnections([]);
+      return;
+    }
+
+    const currentResult = findConnections(receipts);
+    if (connections.length === currentResult.length && connections.length > 0) {
+      return;
+    }
     
     let mounted = true;
     setIsComputing(true);
     
     const timer = setTimeout(() => {
-      const result = findConnections(receipts);
       if (mounted) {
-        setConnections(result);
+        setConnections(currentResult);
         setIsComputing(false);
       }
     }, 0);
@@ -24,7 +33,7 @@ export function useConnections(receipts: LifeReceipt[]) {
       mounted = false;
       clearTimeout(timer);
     };
-  }, [receipts]);
+  }, [receipts, connections]);
   
   const getConnectionsFor = useCallback((receiptId: string) => {
     return getConnectionsForReceipt(receiptId, connections);

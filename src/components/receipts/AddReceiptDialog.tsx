@@ -281,10 +281,11 @@ export function AddReceiptDialog({
         {/* Common Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="receipt-title" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Title / Description *
             </label>
             <input
+              id="receipt-title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -305,10 +306,11 @@ export function AddReceiptDialog({
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="receipt-timestamp" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Date & Time *
             </label>
             <input
+              id="receipt-timestamp"
               type="datetime-local"
               value={timestamp}
               onChange={(e) => setTimestamp(e.target.value)}
@@ -318,10 +320,11 @@ export function AddReceiptDialog({
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
+            <label htmlFor="receipt-tags" className="block text-xs font-mono uppercase tracking-wider text-ink-600 mb-1">
               Tags (comma separated)
             </label>
             <input
+              id="receipt-tags"
               type="text"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
@@ -340,8 +343,9 @@ export function AddReceiptDialog({
           {selectedType === 'music' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-ink-600 mb-1">Artist</label>
+                <label htmlFor="receipt-artist" className="block text-[11px] font-mono text-ink-600 mb-1">Artist</label>
                 <input
+                  id="receipt-artist"
                   type="text"
                   value={artist}
                   onChange={(e) => setArtist(e.target.value)}
@@ -350,8 +354,9 @@ export function AddReceiptDialog({
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-ink-600 mb-1">Album</label>
+                <label htmlFor="receipt-album" className="block text-[11px] font-mono text-ink-600 mb-1">Album</label>
                 <input
+                  id="receipt-album"
                   type="text"
                   value={album}
                   onChange={(e) => setAlbum(e.target.value)}
@@ -360,8 +365,9 @@ export function AddReceiptDialog({
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-ink-600 mb-1">Platform</label>
+                <label htmlFor="receipt-platform" className="block text-[11px] font-mono text-ink-600 mb-1">Platform</label>
                 <select
+                  id="receipt-platform"
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value)}
                   className="w-full px-2.5 py-1.5 bg-parchment-50 border border-ink-300 rounded-sm text-xs"
@@ -390,8 +396,9 @@ export function AddReceiptDialog({
           {(selectedType === 'expense' || selectedType === 'transaction') && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-ink-600 mb-1">Amount (₹ INR)</label>
+                <label htmlFor="receipt-amount" className="block text-[11px] font-mono text-ink-600 mb-1">Amount (₹ INR)</label>
                 <input
+                  id="receipt-amount"
                   type="number"
                   step="0.01"
                   value={amount}
@@ -401,8 +408,9 @@ export function AddReceiptDialog({
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-ink-600 mb-1">Category</label>
+                <label htmlFor="receipt-category" className="block text-[11px] font-mono text-ink-600 mb-1">Category</label>
                 <input
+                  id="receipt-category"
                   type="text"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -412,8 +420,9 @@ export function AddReceiptDialog({
               </div>
               {selectedType === 'expense' && (
                 <div>
-                  <label className="block text-[11px] font-mono text-ink-600 mb-1">Payment Mode</label>
+                  <label htmlFor="receipt-payment-mode" className="block text-[11px] font-mono text-ink-600 mb-1">Payment Mode</label>
                   <select
+                    id="receipt-payment-mode"
                     value={paymentMode}
                     onChange={(e) => setPaymentMode(e.target.value)}
                     className="w-full px-2.5 py-1.5 bg-parchment-50 border border-ink-300 rounded-sm text-xs"
@@ -428,8 +437,9 @@ export function AddReceiptDialog({
               )}
               {selectedType === 'transaction' && (
                 <div>
-                  <label className="block text-[11px] font-mono text-ink-600 mb-1">Merchant</label>
+                  <label htmlFor="receipt-merchant" className="block text-[11px] font-mono text-ink-600 mb-1">Merchant</label>
                   <input
+                    id="receipt-merchant"
                     type="text"
                     value={merchant}
                     onChange={(e) => setMerchant(e.target.value)}
@@ -444,10 +454,11 @@ export function AddReceiptDialog({
           {(selectedType === 'place' || selectedType === 'event') && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-ink-600 mb-1">
+                <label htmlFor="receipt-place-name" className="block text-[11px] font-mono text-ink-600 mb-1">
                   {selectedType === 'place' ? 'Venue / Place Name' : 'Venue / Location'}
                 </label>
                 <input
+                  id="receipt-place-name"
                   type="text"
                   value={placeName}
                   onChange={(e) => setPlaceName(e.target.value)}
@@ -456,8 +467,9 @@ export function AddReceiptDialog({
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-ink-600 mb-1">City / State</label>
+                <label htmlFor="receipt-city" className="block text-[11px] font-mono text-ink-600 mb-1">City / State</label>
                 <input
+                  id="receipt-city"
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
@@ -469,7 +481,7 @@ export function AddReceiptDialog({
           )}
 
           <div>
-            <label className="block text-[11px] font-mono text-ink-600 mb-1">
+            <label htmlFor="receipt-notes" className="block text-[11px] font-mono text-ink-600 mb-1">
               {selectedType === 'message'
                 ? 'Message Excerpt'
                 : selectedType === 'note'
@@ -477,6 +489,7 @@ export function AddReceiptDialog({
                 : 'Additional Notes'}
             </label>
             <textarea
+              id="receipt-notes"
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

@@ -1,9 +1,24 @@
 import { LifeReceipt, Pattern, SpotifyStats, HouseholdStats } from '@/types';
 import { getHour, getDayOfWeek } from '@/lib/utils';
 
+let cachedPatternsReceiptsRef: LifeReceipt[] | null = null;
+let cachedPatternsReceiptsCount = -1;
+let cachedPatternsSpotifyStats: SpotifyStats | null = null;
+let cachedPatternsHouseholdStats: HouseholdStats | null = null;
+let cachedPatternsResult: Pattern[] | null = null;
+
 export function detectPatterns(receipts: LifeReceipt[], spotifyStats: SpotifyStats | null, householdStats: HouseholdStats | null): Pattern[] {
   const patterns: Pattern[] = [];
-  if (!receipts.length) return patterns;
+  if (!receipts || !receipts.length) return patterns;
+
+  if (
+    cachedPatternsResult &&
+    (receipts === cachedPatternsReceiptsRef || receipts.length === cachedPatternsReceiptsCount) &&
+    spotifyStats === cachedPatternsSpotifyStats &&
+    householdStats === cachedPatternsHouseholdStats
+  ) {
+    return cachedPatternsResult;
+  }
   
   // 1. Peak Listening Hours
   if (spotifyStats && spotifyStats.hourDistribution && spotifyStats.hourDistribution.length > 0) {
@@ -114,6 +129,12 @@ export function detectPatterns(receipts: LifeReceipt[], spotifyStats: SpotifySta
     }
   }
   
+  cachedPatternsReceiptsRef = receipts;
+  cachedPatternsReceiptsCount = receipts.length;
+  cachedPatternsSpotifyStats = spotifyStats;
+  cachedPatternsHouseholdStats = householdStats;
+  cachedPatternsResult = patterns;
+
   return patterns;
 }
 
