@@ -4,6 +4,7 @@ import { OrbitControls, Html, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Chapter, LifeReceipt, DataSource } from '@/types';
 import { TYPE_COLORS, formatCount, formatDateRange } from '@/lib/utils';
+import { Rotate3d, ArrowUpDown } from 'lucide-react';
 
 interface LifeOrbitProps {
   chapters: Chapter[];
@@ -14,45 +15,73 @@ interface LifeOrbitProps {
 }
 
 const DOMAIN_CENTERS = {
-  music: new THREE.Vector3(-3.5, 1.8, 0),
-  expense: new THREE.Vector3(-3.0, -2.2, 0),
-  transaction: new THREE.Vector3(3.8, 0.2, 0),
+  music: new THREE.Vector3(-3.8, 2.0, 0),
+  expense: new THREE.Vector3(-3.2, -2.4, 0),
+  transaction: new THREE.Vector3(4.0, 0.0, 0),
   core: new THREE.Vector3(0, 0, 0),
 };
 
-// Orbital Rings component — renders delicate concentric astronomical tracks
+// Orbital Rings component — renders delicate concentric astronomical tracks with domain labels
 const OrbitalRings = () => {
-  const rings = useMemo(() => [3.2, 4.8, 6.8], []);
+  const ringObjects = useMemo(() => {
+    return [
+      { radius: 3.0, color: '#C4622D', opacity: 0.25 }, // Music track
+      { radius: 5.0, color: '#8B6914', opacity: 0.4 },  // The Convergence track
+      { radius: 7.0, color: '#2B4B6F', opacity: 0.25 }, // Transactions track
+    ].map((ring) => {
+      const points = [];
+      const segments = 80;
+      for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * Math.PI * 2;
+        points.push(new THREE.Vector3(Math.cos(theta) * ring.radius, Math.sin(theta) * ring.radius, 0));
+      }
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({ color: ring.color, transparent: true, opacity: ring.opacity });
+      return new THREE.LineLoop(geometry, material);
+    });
+  }, []);
 
   return (
-    <group rotation={[-Math.PI / 6, 0, 0]}>
-      {rings.map((radius, idx) => {
-        const points = [];
-        const segments = 64;
-        for (let i = 0; i <= segments; i++) {
-          const theta = (i / segments) * Math.PI * 2;
-          points.push(new THREE.Vector3(Math.cos(theta) * radius, Math.sin(theta) * radius, 0));
-        }
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    <group rotation={[-Math.PI / 8, 0, 0]}>
+      {ringObjects.map((obj, idx) => (
+        <primitive key={idx} object={obj} />
+      ))}
+    </group>
+  );
+};
 
-        return (
-          <lineLoop key={idx} geometry={geometry}>
-            <lineBasicMaterial attach="material" color="#C8C2B5" transparent opacity={0.35} />
-          </lineLoop>
-        );
-      })}
+// Constellation Lines connecting domains to central Life Core
+const ConstellationLines = () => {
+  const lineObjects = useMemo(() => {
+    return [
+      [DOMAIN_CENTERS.core, DOMAIN_CENTERS.music],
+      [DOMAIN_CENTERS.core, DOMAIN_CENTERS.expense],
+      [DOMAIN_CENTERS.core, DOMAIN_CENTERS.transaction],
+      [DOMAIN_CENTERS.music, DOMAIN_CENTERS.expense], // Convergence bridge
+    ].map(([start, end]) => {
+      const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+      const material = new THREE.LineBasicMaterial({ color: '#D5D0C8', transparent: true, opacity: 0.35 });
+      return new THREE.Line(geometry, material);
+    });
+  }, []);
+
+  return (
+    <group>
+      {lineObjects.map((obj, idx) => (
+        <primitive key={idx} object={obj} />
+      ))}
     </group>
   );
 };
 
 // Ambient moment particles orbiting the core
-const AmbientMoments = ({ count = 40 }: { count?: number }) => {
+const AmbientMoments = ({ count = 48 }: { count?: number }) => {
   const particles = useMemo(() => {
     const arr = [];
     const colors = ['#C4622D', '#3D5A47', '#2B4B6F', '#8B6914'];
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (i % 3);
-      const radius = 2.2 + (i % 5) * 0.9;
+      const radius = 2.0 + (i % 5) * 1.0;
       const x = Math.cos(angle) * radius;
       const y = Math.sin(angle) * radius * 0.7;
       const z = Math.sin(i * 1.5) * 1.2;
@@ -67,7 +96,7 @@ const AmbientMoments = ({ count = 40 }: { count?: number }) => {
       {particles.map((p, i) => (
         <mesh key={i} position={p.position}>
           <sphereGeometry args={[0.06, 12, 12]} />
-          <meshBasicMaterial color={p.color} transparent opacity={0.65} />
+          <meshBasicMaterial color={p.color} transparent opacity={0.6} />
         </mesh>
       ))}
     </group>
@@ -90,12 +119,12 @@ const NodeSphere = ({
   const meshRef = useRef<THREE.Mesh>(null);
   const color = TYPE_COLORS[chapter.dominantType] || '#1A1814';
 
-  const size = Math.max(0.28, Math.min(0.65, (chapter.stats.totalReceipts / 2000) * 0.5 + 0.28));
+  const size = Math.max(0.28, Math.min(0.6, (chapter.stats.totalReceipts / 2000) * 0.45 + 0.28));
   const scale = isSelected ? 1.35 : 1;
 
   useFrame(() => {
     if (meshRef.current && isSelected) {
-      meshRef.current.rotation.y += 0.015;
+      meshRef.current.rotation.y += 0.02;
     }
   });
 
@@ -125,15 +154,28 @@ const NodeSphere = ({
       {isSelected && (
         <mesh rotation={[Math.PI / 4, 0, 0]}>
           <ringGeometry args={[size * 1.4, size * 1.55, 32]} />
-          <meshBasicMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.6} />
+          <meshBasicMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.65} />
         </mesh>
       )}
     </group>
   );
 };
 
-const LifeOrbitScene = ({ chapters, selectedChapterId, onNodeSelect, filterSource }: LifeOrbitProps) => {
+const LifeOrbitScene = ({
+  chapters,
+  selectedChapterId,
+  onNodeSelect,
+  filterSource,
+}: LifeOrbitProps) => {
   const [hoveredChapter, setHoveredChapter] = useState<Chapter | null>(null);
+  const sceneGroupRef = useRef<THREE.Group>(null);
+
+  // Gentle, continuous celestial rotation
+  useFrame((_, delta) => {
+    if (sceneGroupRef.current) {
+      sceneGroupRef.current.rotation.y += delta * 0.04;
+    }
+  });
 
   const visibleChapters = useMemo(() => {
     if (!filterSource) return chapters;
@@ -160,7 +202,7 @@ const LifeOrbitScene = ({ chapters, selectedChapterId, onNodeSelect, filterSourc
       if (isConvergence && (chapter.dominantType === 'music' || chapter.dominantType === 'expense')) {
         const angle = (i * Math.PI * 2) / Math.max(6, visibleChapters.length);
         const radius = 1.6;
-        pos.set(-3.2 + Math.cos(angle) * radius, 0 + Math.sin(angle) * radius, seedZ * 0.4);
+        pos.set(-3.4 + Math.cos(angle) * radius, 0 + Math.sin(angle) * radius, seedZ * 0.4);
       } else {
         const angle = (i * Math.PI * 2) / Math.max(1, visibleChapters.length);
         const radius = 2.4 + (i % 3) * 0.5;
@@ -172,13 +214,16 @@ const LifeOrbitScene = ({ chapters, selectedChapterId, onNodeSelect, filterSourc
   }, [visibleChapters]);
 
   return (
-    <>
+    <group ref={sceneGroupRef}>
       <ambientLight intensity={0.9} color="#FFFFFF" />
       <directionalLight position={[6, 8, 6]} intensity={1.1} color="#FFF8EE" />
       <directionalLight position={[-6, -6, -4]} intensity={0.4} color="#DCE5EF" />
 
       {/* Orbital Tracks */}
       <OrbitalRings />
+
+      {/* Constellation lines */}
+      <ConstellationLines />
 
       {/* Ambient revolving moment dots */}
       <AmbientMoments count={48} />
@@ -190,9 +235,26 @@ const LifeOrbitScene = ({ chapters, selectedChapterId, onNodeSelect, filterSourc
         </Sphere>
         <mesh rotation={[Math.PI / 3, 0, 0]}>
           <ringGeometry args={[1.3, 1.42, 48]} />
-          <meshBasicMaterial color="#8A8480" side={THREE.DoubleSide} transparent opacity={0.3} />
+          <meshBasicMaterial color="#8A8480" side={THREE.DoubleSide} transparent opacity={0.35} />
         </mesh>
       </group>
+
+      {/* Domain Markers (Clean HTML badges that never clip) */}
+      <Html position={[-3.8, 3.2, 0]} center style={{ pointerEvents: 'none' }}>
+        <div className="bg-burnt-100/90 border border-burnt-500/40 px-2 py-0.5 rounded text-[10px] font-mono text-burnt-700 uppercase tracking-widest whitespace-nowrap shadow-xs">
+          ✦ Music Domain
+        </div>
+      </Html>
+      <Html position={[-3.2, -3.4, 0]} center style={{ pointerEvents: 'none' }}>
+        <div className="bg-forest-100/90 border border-forest-500/40 px-2 py-0.5 rounded text-[10px] font-mono text-forest-700 uppercase tracking-widest whitespace-nowrap shadow-xs">
+          ✦ Household Domain
+        </div>
+      </Html>
+      <Html position={[4.0, 1.4, 0]} center style={{ pointerEvents: 'none' }}>
+        <div className="bg-navy-100/90 border border-navy-500/40 px-2 py-0.5 rounded text-[10px] font-mono text-navy-700 uppercase tracking-widest whitespace-nowrap shadow-xs">
+          ✦ Transactions Domain
+        </div>
+      </Html>
 
       {/* Chapter Spheres */}
       {nodes.map(({ chapter, position }) => (
@@ -254,12 +316,13 @@ const LifeOrbitScene = ({ chapters, selectedChapterId, onNodeSelect, filterSourc
           </div>
         </Html>
       )}
-    </>
+    </group>
   );
 };
 
 export default function LifeOrbit(props: LifeOrbitProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileInteractive, setMobileInteractive] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -270,25 +333,55 @@ export default function LifeOrbit(props: LifeOrbitProps) {
 
   return (
     <div className="w-full h-full bg-parchment-100 relative" role="img" aria-label="3D Visualization of Life Data Chapters">
-      <Canvas
-        frameloop="demand"
-        camera={{
-          position: isMobile ? [0, 0.5, 20] : [0, 0, 16],
-          fov: isMobile ? 52 : 45,
-        }}
-      >
-        <OrbitControls
-          enablePan={false}
-          enableZoom={false} // Disable zoom on canvas so touch pinch/scroll doesn't trap mobile users
-          enableRotate={true}
-          rotateSpeed={0.8}
-          touches={{
-            ONE: THREE.TOUCH.ROTATE,
-            TWO: THREE.TOUCH.DOLLY_PAN,
+      {/* Mobile Mode Switcher: ensures single-finger scroll works effortlessly over canvas by default */}
+      {isMobile && (
+        <div className="absolute bottom-3 right-3 z-20">
+          <button
+            onClick={() => setMobileInteractive(!mobileInteractive)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider shadow-sm transition-all border ${
+              mobileInteractive
+                ? 'bg-ink-900 text-parchment-100 border-ink-900'
+                : 'bg-parchment-50/90 text-ink-700 border-ink-300 backdrop-blur-sm'
+            }`}
+            aria-pressed={mobileInteractive}
+          >
+            {mobileInteractive ? (
+              <>
+                <ArrowUpDown size={13} />
+                <span>Scroll Mode</span>
+              </>
+            ) : (
+              <>
+                <Rotate3d size={13} />
+                <span>Rotate 3D</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Canvas container: on mobile, pointer-events-none when in scroll mode so vertical touch scrolls the page cleanly */}
+      <div className={`w-full h-full ${isMobile && !mobileInteractive ? 'pointer-events-none' : 'pointer-events-auto'}`}>
+        <Canvas
+          frameloop="demand"
+          camera={{
+            position: isMobile ? [0, 0.5, 20] : [0, 0, 16],
+            fov: isMobile ? 52 : 45,
           }}
-        />
-        <LifeOrbitScene {...props} />
-      </Canvas>
+        >
+          <OrbitControls
+            enablePan={!isMobile}
+            enableZoom={!isMobile} // Disable zoom on mobile so pinch gestures don't trap the user
+            enableRotate={!isMobile || mobileInteractive} // Mobile rotation only active when explicitly enabled
+            rotateSpeed={0.8}
+            touches={{
+              ONE: THREE.TOUCH.ROTATE,
+              TWO: THREE.TOUCH.DOLLY_PAN,
+            }}
+          />
+          <LifeOrbitScene {...props} />
+        </Canvas>
+      </div>
     </div>
   );
 }

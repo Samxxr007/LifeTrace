@@ -5,15 +5,16 @@ import TimelineBar from '@/components/journey/TimelineBar';
 import LifeOrbit2D from '@/components/visualization/LifeOrbit2D';
 import StatComposition from '@/components/visualization/StatComposition';
 import { LoadingState } from '@/components/ui/LoadingState';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useLifeData } from '@/hooks/useLifeData';
 import { useConnections } from '@/hooks/useConnections';
 import { useChapters } from '@/hooks/useChapters';
 import { computeInsights } from '@/engine/insights';
 import { formatDateRange, formatCount, TYPE_COLORS } from '@/lib/utils';
-import { ArrowRight, Compass, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// Lazy load the 3D orbit component
+// Lazy-loaded 3D Life Orbit
 const LifeOrbit = React.lazy(() => import('@/components/visualization/LifeOrbit'));
 
 export default function Journey() {
@@ -53,14 +54,6 @@ export default function Journey() {
     window.location.href = `/discover?view=stories&chapter=${id}`;
   };
 
-  if (isLoading) {
-    return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-parchment-100">
-        <LoadingState message="Tracing your moments..." />
-      </div>
-    );
-  }
-
   const selectedChapter = chapters.find((c) => c.id === selectedChapterId) || null;
   const use3D = canUseWebGL && !prefersReducedMotion;
 
@@ -79,14 +72,14 @@ export default function Journey() {
       <h1 className="sr-only">Life Journey — Life Orbit & Timeline</h1>
 
       {/* Top Filter Bar */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 pt-6 pb-2 flex flex-wrap justify-between items-center gap-3">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 pt-6 pb-3 flex flex-wrap justify-between items-center gap-3">
         <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-ink-500">Life Orbit</span>
-          <h2 className="font-display text-2xl sm:text-3xl text-ink-900">Celestial Archive</h2>
+          <span className="font-mono text-xs uppercase tracking-widest text-ink-500">Visual Centerpiece</span>
+          <h2 className="font-display text-2xl sm:text-3xl text-ink-900">Life Orbit</h2>
         </div>
 
         {/* Domain Filter Buttons */}
-        <div className="flex items-center space-x-2 sm:space-x-4 bg-parchment-200 p-1 rounded-sm border border-ink-300">
+        <div className="flex items-center space-x-1.5 sm:space-x-3 bg-parchment-200 p-1 rounded-sm border border-ink-300">
           <button
             onClick={() => setFilterSource(null)}
             className={`px-3 py-1 font-mono text-xs tracking-wider rounded-sm transition-colors ${
@@ -124,22 +117,28 @@ export default function Journey() {
 
       {/* 3D Orbit Viewport — fixed responsive height, scrollable past it */}
       <section className="relative w-full h-[48vh] sm:h-[58vh] md:h-[65vh] border-y border-ink-300 bg-parchment-100">
-        {use3D ? (
-          <Suspense
-            fallback={
-              <div className="w-full h-full flex items-center justify-center font-mono text-xs text-ink-500">
-                Rendering celestial orbit...
-              </div>
-            }
-          >
-            <LifeOrbit
-              chapters={chapters}
-              receipts={receipts}
-              selectedChapterId={selectedChapterId}
-              onNodeSelect={handleNodeSelect}
-              filterSource={filterSource}
-            />
-          </Suspense>
+        {isLoading ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <LoadingState message="Mapping celestial orbits..." />
+          </div>
+        ) : use3D ? (
+          <ErrorBoundary>
+            <Suspense
+              fallback={
+                <div className="w-full h-full flex items-center justify-center font-mono text-xs text-ink-500">
+                  <LoadingState message="Rendering celestial orbit..." />
+                </div>
+              }
+            >
+              <LifeOrbit
+                chapters={chapters}
+                receipts={receipts}
+                selectedChapterId={selectedChapterId}
+                onNodeSelect={handleNodeSelect}
+                filterSource={filterSource}
+              />
+            </Suspense>
+          </ErrorBoundary>
         ) : (
           <LifeOrbit2D
             chapters={chapters}
@@ -152,15 +151,26 @@ export default function Journey() {
 
         {/* Minimal, non-intrusive convergence badge */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-          <div className="inline-flex items-center gap-2 bg-parchment-50/90 backdrop-blur-sm border border-ink-300 px-3 py-1 rounded-full text-xs font-mono text-ink-700 shadow-sm">
+          <div className="inline-flex items-center gap-1.5 bg-parchment-50/90 backdrop-blur-sm border border-ink-300 px-3 py-1 rounded-full text-xs font-mono text-ink-700 shadow-xs">
             <Sparkles size={12} className="text-amber-600" />
-            <span>2015–2018 Convergence: Music & Expenses intersect</span>
+            <span>2015–2018 Convergence: Music & Daily Life Intersect</span>
           </div>
         </div>
 
-        {/* Mobile touch guidance */}
-        <div className="absolute bottom-2 right-4 pointer-events-none z-10 font-mono text-[10px] text-ink-400 uppercase tracking-widest hidden sm:block">
-          Drag horizontally to rotate • Scroll to explore
+        {/* Legend */}
+        <div className="absolute bottom-2 left-4 pointer-events-none z-10 flex items-center gap-3 font-mono text-[10px] text-ink-500 uppercase tracking-wider hidden sm:flex">
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-burnt-500 inline-block" /> Music
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-forest-500 inline-block" /> Household
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-navy-500 inline-block" /> Transactions
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" /> The Convergence
+          </span>
         </div>
       </section>
 
