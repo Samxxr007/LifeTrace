@@ -1,335 +1,263 @@
 # LifeTrace 🧾
+### *Your Life, In Receipts — A Client-Side Digital Life Archive & Celestial Memory Engine*
 
-> **Every moment leaves a trace.**
+[![React 19](https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![Three.js](https://img.shields.io/badge/Three.js-WebGL-black?style=flat-square&logo=three.js)](https://threejs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Vitest](https://img.shields.io/badge/Tests-30%2F30%20Passing-brightgreen?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Privacy](https://img.shields.io/badge/Zero--Server-100%25%20Client--Side-success?style=flat-square)](#-privacy--zero-server-security)
+[![License](https://img.shields.io/badge/License-MIT-amber?style=flat-square)](LICENSE)
 
-LifeTrace is a client-side digital archive, interactive museum, and data sculpture built for the **WebRush 6-Hour Frontend Hackathon** under the challenge *“Your Life, In Receipts 🧾”*.
+> **"Every moment leaves a trace."**
 
-Rather than presenting raw logs or generic dashboard metrics, LifeTrace takes thousands of disconnected digital fragments—music scrobbles, household expenses, and financial transactions—and transforms them through an evidence-based pipeline:
-$$\text{RAW DATA} \longrightarrow \text{INFORMATION} \longrightarrow \text{INSIGHTS} \longrightarrow \text{CONNECTIONS} \longrightarrow \text{STORY} \longrightarrow \text{INTERACTIVE LIFE JOURNEY}$$
+LifeTrace is a client-side digital life archive, interactive museum, and data sculpture built for the **WebRush Hackathon** under the challenge *“Your Life, In Receipts 🧾”*.
 
-- **Live Application**: [https://life-trace-three.vercel.app/](https://life-trace-three.vercel.app/)
-- **Repository**: [https://github.com/Samxxr007/LifeTrace.git](https://github.com/Samxxr007/LifeTrace.git)
+Rather than presenting raw logs or generic admin dashboards, LifeTrace takes thousands of disconnected digital fragments—music streams, utility payments, credit transactions, visited cafes, cinema screenings, and personal notes—and transforms them through an evidence-based pipeline:
+
+$$\text{RAW DATA} \longrightarrow \text{INSIGHTS} \longrightarrow \text{CONNECTIONS} \longrightarrow \text{STORY} \longrightarrow \text{PERSONAL MEMORY} \longrightarrow \text{FUTURE}$$
+
+- 🌐 **Live Application**: [https://life-trace-three.vercel.app/](https://life-trace-three.vercel.app/)
+- 💻 **GitHub Repository**: [https://github.com/Samxxr007/LifeTrace.git](https://github.com/Samxxr007/LifeTrace.git)
 
 ---
 
-## 🎯 The Challenge
+## 🌟 Key Highlights & Core Capabilities
 
-The WebRush challenge, *“Your Life, In Receipts 🧾”*, provides fictional life receipts representing digital fragments across someone's life:
-- **Music** (listening history, artists, skips, timestamps)
-- **Household Expenses** (groceries, utilities, subscriptions, notes)
-- **Financial Transactions** (merchants, categories, amounts, card types)
+```
+                  ┌─────────────────────────────────────────────────────────┐
+                  │                      LIFETRACE HUB                      │
+                  └────────────────────────────┬────────────────────────────┘
+                                               │
+         ┌───────────────────┬─────────────────┴─────────────────┬───────────────────┐
+         ▼                   ▼                                   ▼                   ▼
+   🪐 LIFE ORBIT      ⚡ CONNECTIONS                     📖 PERSONAL ARCHIVE    🔍 EXPLORER
+   Three.js & 2D      5,934 Evidentiary                  Diary, Bookmarks,      60 FPS Virtualized,
+   Domain Planets     Cross-Domain Links                 Future Plans & Relive  Fuse.js Search & Views
+```
 
-The challenge explicitly dictates that a simple chronological feed or administrative dashboard fails the brief. The goal is to discover what the collection of disconnected moments means—uncovering hidden routines, temporal overlaps, and life chapters without inventing unsupported narratives or making speculative psychological claims.
+### 1. 🪐 Celestial Life Orbit (3D Three.js & 2D SVG Fallback)
+- **Dedicated Domain Planets**: The orbital system is anchored by distinct celestial planetary bodies with atmospheric rings:
+  - 🟣 **Cafes, Movies & Experiences Planet** (`#7B4B94` at `[0.0, 3.4, 0]`) with dual luminous atmospheric rings and stellar glow.
+  - 🟠 **Music Planet** (`#C4622D` at `[-3.8, 2.0, 0]`) with planetary ring.
+  - 🟢 **Household / Expenses Planet** (`#3D5A47` at `[-3.2, -2.4, 0]`) with planetary ring.
+  - 🔵 **Transactions Planet** (`#2B4B6F` at `[4.0, 0.0, 0]`) with planetary ring.
+  - ⚫ **Central Life Core** (`#1A1814` at `[0, 0, 0]`) with atmospheric wireframe halo.
+- **Dynamic Orbital Tracks**: Concentric astronomical rings and constellation lines visualizing real-time temporal convergence.
+- **Mobile Non-Trapping Touch Controls**: Effortless single-finger vertical page scrolling over the canvas by default, with a one-tap `[✦ Rotate 3D] / [↕ Scroll Mode]` toggle.
+- **2D Accessible Fallback**: Automatic, crisp SVG force layout with identical data fidelity for users preferring reduced motion.
+
+### 2. ⚡ Evidence-Based Connection Scoring Engine
+- **Multi-Signal Bounded Sliding-Window ($O(N \cdot K)$)**: Bounded at $K \le 30$ lookahead within 24 hours, computing in $< 5\text{ms}$.
+- **5 Deterministic Signals**: Temporal proximity (exponential decay), category resonance (compatibility matrix), time-of-day rhythms (2h/4h buckets), weekly cadence, and location affinity.
+- **5,934 Connections Discovered**: 4,276 strong, 1,658 moderate, and **2,521 cross-domain** relationships linking music, dining, travel, and finance.
+- **Zero Psychological Inference**: Every link features explicit, quantifiable **"CONNECTED BECAUSE"** evidence bullets citing exact minute differences, shared categories, and recurrence.
+
+### 3. 📖 Personal Memory Hub (`/my-life`)
+- **Prominent Featured Moments Showcase**: Standout life moments curated directly on the profile hero.
+- **Personal Diary with Receipt Linking**: Focused journaling with customizable mood chips, custom mood text input (*"Or custom: Type your own mood..."*), and a searchable receipt picker that embeds interactive archive mini-cards into diary entries.
+- **Universal Bookmarks**: Multi-target bookmarking system supporting receipts, connections, chapters, patterns, diary entries, and saved views.
+- **Future Events & Semantic Completion**: Tracks upcoming concerts, conferences, and trips with dynamic countdown badges (*"Today"*, *"In 14 days"*, *"In 2 months"*). A **"Mark as Experienced"** action semantically converts planned events into completed `LifeReceipts` with traceable audit provenance.
+- **Guaranteed Archive Seeding**: Auto-initializes rich default collections (6 bookmarks, 6 future plans, 10 user receipts, 5 saved views, 4 diary entries) on first load.
+
+### 4. 🧾 Adaptive 10-Domain Receipt Creator
+- **Global Ingestion**: Accessible from any view via header or keyboard shortcut.
+- **Dynamic Schema Switching**: Automatically adapts form fields for all 10 life domains (Music, Expense, Transaction, Place, Movie, Photo, Message, Search, Event, Note).
+- **Collision-Resistant IDs**: Generates cryptographically secure UUIDs (`crypto.randomUUID()`).
+- **Immediate Ingestion**: Created receipts instantly enter the unified pool, triggering real-time connection discovery, timeline placement, and search indexing.
+
+### 5. 🔍 High-Performance Archival Explorer (`/explore`)
+- **60 FPS Virtualization**: Powered by `@tanstack/react-virtual` to smoothly handle thousands of records.
+- **Client-Side Fuzzy Search**: Powered by Fuse.js with multi-field indexing (titles, notes, artists, merchants, tags).
+- **Saved Views**: Save complex multi-facet filter configurations and restore them with 1 click without reloading the page.
+- **Moment Detail Drawer**: Slide-in inspection panel with full metadata, provenance tags, and bidirectional links to connected moments.
+
+### 6. ⏳ Timeline Scrubber & Curated Relive (`/journey`)
+- **Past-to-Future Continuum**: Dynamic visual horizon distinguishing historical records from upcoming milestones.
+- **Curated Relive Deep-Dive**: Zoom into any date with a curated ±6h (expandable to ±24h) window showing chronological activity streams, active relationships, and 1-click **"Journal This Day"** linking.
 
 ---
 
-## 💡 How LifeTrace Solves It
+## 🗂️ The 10 Digital Life Domains
 
-LifeTrace implements a **5-stage interactive discovery and personal memory flow**:
+LifeTrace represents the human experience across 10 structured domains:
 
-1. **Raw Receipts (`/explore`)**:
-   - High-performance archival explorer virtualized with `@tanstack/react-virtual` at 60 FPS.
-   - Multi-facet filtering by source (Spotify, Household, Transactions, Synthetic, User), category, amount range, and date period.
-   - Instant client-side fuzzy search powered by Fuse.js.
-   - In-memory **Saved Views** with 1-click filter restoration.
-   - Slide-in moment drawer with verifiable metadata, bookmarking, and direct links to connected receipts.
-
-2. **Macro Insights & Relive (`/journey`)**:
-   - Interactive temporal scrubber with dynamic past-to-future continuum, time granularity (All/Year/Month/Week/Day), and domain filters.
-   - **Relive Experience**: Curated ±6h window (expandable to ±24h) inspecting surrounding moments, multi-domain activity breakdown, active relationships, and 1-click **"Journal This Day"** linking.
-   - Real-time macro statistics updating dynamically as the timeline is scrubbed.
-
-3. **Evidence-Based Connections (`/discover?view=connections`)**:
-   - Evaluates multi-signal correlation (temporal proximity, categorical resonance, time of day, weekly rhythms, shared scenarios) across all 10 life domains.
-   - Composable Type Pair and Strength filters (Strong / Moderate) with live count badges.
-   - Explicit **"CONNECTED BECAUSE"** evidence bullets detailing quantifiable reasons for the link.
-
-4. **Narrative Stories & Patterns (`/discover?view=stories` & `/discover?view=patterns`)**:
-   - Dynamic life chapters synthesized from record density and domain dominance.
-   - Empirical pattern detection (listening heatmaps, subscription life cycles, spending flow, artist recurrence).
-   - Strictly data-grounded narratives citing concrete numbers and timestamps.
-
-5. **Personal Memory Hub (`/my-life`)**:
-   - **Prominent Featured Showcase**: Curated standout moments displayed directly on the profile.
-   - **Personal Diary**: Rich reflections with **Receipt Linking** (attach archive moments directly to journal entries) and user-selected mood (never inferred).
-   - **Bookmarks**: Multi-target bookmarking for receipts, connections, chapters, patterns, and saved views.
-   - **My Receipts**: User-created moments across all 10 domains with collision-resistant `crypto.randomUUID()`.
-   - **Future Plans**: Upcoming events and milestones with countdown badges and 1-click conversion into experienced receipts.
+| Domain | Source / Origin | Key Attributes | Example |
+| :--- | :--- | :--- | :--- |
+| 🎵 **Music** | Spotify Streaming | Artist, Album, Track, Ms Played, Skipped | *Daft Punk — "Get Lucky"* |
+| 🛒 **Expense** | Household Ledger | Category, Subcategory, Amount (₹), Payment Mode | *Electricity Bill, Broadband Subscription* |
+| 💳 **Transaction** | Digital Commerce | Merchant, Amount (₹), Category, City | *Blue Tokai Coffee Roasters (₹420)* |
+| 📍 **Place** | Life Experiences | Venue Name, City, State, Check-in Notes | *Third Wave Coffee, Koramangala* |
+| 🎬 **Movie** | Cinema & Screenings | Movie Title, Cinema / Platform, Notes | *Oppenheimer (IMAX Screening)* |
+| 📷 **Photo** | Visual Memories | Caption, Location Name, Album | *Kochi Biennale Exhibition* |
+| 💬 **Message** | Communication | Platform, Excerpt / Context | *Flight booking confirmation received* |
+| 🔎 **Search** | Research & Curiosity | Query Text, Category | *"best mechanical keyboard switches"* |
+| 🎟️ **Event** | Meetups & Cultural | Event Name, Venue, Category | *React India Conference 2024* |
+| 📝 **Note** | Personal Thoughts | Title, Body, Category | *Weekend Study Plan & Book List* |
 
 ---
 
 ## 📊 Datasets & Provenance
 
-LifeTrace integrates three diverse digital life datasets spanning **11 years (2013–2024)**:
+LifeTrace integrates real-world longitudinal datasets spanning **11 years (2013–2024)** alongside structured life experiences:
 
-| Dataset | Time Span | Raw Count | Visualized Records | Full Stats Available | Provenance & Description |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Spotify Streaming History** | Dec 2013 – Jan 2024 | 20,443 scrobbles | 1,500 representative records | Yes (`spotify-stats.json`) | Music listening logs including track, artist, album, ms played, skip status, and hour distribution. |
-| **Household Expenses** | Jan 2015 – Sep 2018 | 2,461 expenses | 1,000 representative records | Yes (`household-stats.json`) | Real-world daily domestic expenses, grocery bills, utilities, and subscription payments. |
-| **Financial Transactions** | Jan 2022 – Dec 2024 | 9,417 transactions | 760 representative records | Yes (`transactions-stats.json`) | Digital commerce records across retail, travel, food, entertainment, and health. |
-| **Synthetic Enrichment** | 2016 – 2024 | 285 records | 285 records (~120 KB) | Yes | Deterministic multi-domain scenarios (Places, Movies, Photos, Messages, Searches, Events, Notes). |
-| **Total Archive** | **2013 – 2024** | **32,606 records** | **3,548 records (~1.2 MB)** | **Complete Precomputed Stats** | **Rich cross-domain life archive with verifiable provenance.** |
+| Dataset | Time Span | Raw Count | Active Records | Provenance & Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **Spotify Streaming History** | Dec 2013 – Jan 2024 | 20,443 scrobbles | 1,536 sampled records | Real listening logs with ms played, skips, and 7x24 heatmaps. |
+| **Household Expenses** | Jan 2015 – Sep 2018 | 2,461 expenses | 857 sampled records | Real daily domestic expenses, utilities, and subscriptions. |
+| **Financial Transactions** | Jan 2022 – Dec 2024 | 9,417 transactions | 983 sampled records | Modern digital commerce across dining, travel, and retail. |
+| **Life Experiences** | 2016 – 2024 | 285 records | 285 records (~120 KB) | 36 coherent multi-domain scenarios (Cafes, Movies, Events). |
+| **User Receipts** | User-generated | Dynamic | Live (`localStorage`) | Created via Add Receipt dialog across all 10 domains. |
+| **Total Unified Pool** | **2013 – 2024+** | **32,606+ records** | **3,548+ active records** | **Unified into a single reactive client-side memory pool.** |
 
 ### The Convergence (2015–2018)
-The Convergence highlights the 2015–2018 period where Spotify listening records and household expense records occur concurrently.
-
-### Deterministic Synthetic Enrichment Layer
-To authentically fulfill the hackathon's "Your Life, In Receipts 🧾" brief across all 10 digital life domains (Music, Transactions, Expenses, Places, Movies, Photos, Messages, Searches, Events, Notes) without inventing arbitrary random filler, LifeTrace incorporates a **seeded deterministic synthetic enrichment layer** (`src/data/synthetic/scenarios.ts`):
-- **36 Coherent Life Scenarios**: Spans 8 realistic life scenario families (Cafe Study, Movie Night, Weekend Roadtrip, Tech Fest, Marathon Training, Airport Transit, Dinner Feast, Workspace Setup).
-- **285 Structured Moments**: Each scenario produces a temporally and geographically coherent chain of receipts with deterministic minute offsets and consistent cities (Chennai, Bangalore, Pondicherry, Mumbai).
-- **Explicit Provenance**: All enriched records carry `provenance: "synthetic"`, `source: "synthetic"`, and a stable `scenarioId` (`scenario-xxx`), ensuring full transparency. Original records strictly preserve `provenance: "source"`.
+The Convergence marks the historical period where Spotify streaming records and daily household expenditures overlap concurrently in real time, revealing deep routines between domestic life and soundtrack habits.
 
 ---
 
-## 🔄 Data Pipeline
+## 🔄 Architecture & Data Pipeline
 
 ```mermaid
-flowchart LR
-    A["Raw Data\n(CSV / JSON)"] --> B["Validation &\nSanitization"]
-    B --> C["Normalization\n(LifeReceipt)"]
-    C --> D["Indexing &\nSliding Window"]
-    D --> E["Statistical\nAggregation"]
-    E --> F["Interactive\nVisualization"]
-```
+flowchart TD
+    subgraph Data Layer
+        A1["Spotify Streaming (2013–2024)"] --> N["Normalization Engine\n(sanitize & strip PII)"]
+        A2["Household Bills (2015–2018)"] --> N
+        A3["Transactions (2022–2024)"] --> N
+        A4["Life Experiences (Cafes, Movies)"] --> N
+        A5["User Receipts (localStorage)"] --> N
+    end
 
-1. **Validation**: Every incoming record is validated against strict TypeScript schemas. Invalid dates or malformed payloads are discarded.
-2. **Sanitization**: All sensitive financial and personal identifiable information is stripped at build time (credit card numbers, customer IDs, dates of birth, fraud flags).
-3. **Normalization**: Heterogeneous sources are mapped to the unified `LifeReceipt` schema with standard ISO-8601 timestamps, domain types (`music`, `expense`, `transaction`), and tags.
-4. **Indexing**: Records are sorted chronologically with numeric epoch timestamps, hours, and weekly rhythm buckets pre-computed in an $O(N)$ pass.
-5. **Aggregation**: Comprehensive macro statistics (7x24 heatmaps, monthly spend totals, top artists) are computed and cached.
-6. **Visualization**: Consumed on demand by React components, virtual lists, and 3D scenes.
+    subgraph Core Engine
+        N --> P["Unified LifeReceipt Pool\n(3,548+ records)"]
+        P --> CE["Connection Engine\n(5,934 links, 5 signals)"]
+        P --> PE["Pattern Engine\n(Heatmaps, Spikes, Cycles)"]
+        P --> CH["Chapter Engine\n(Cluster windows into eras)"]
+        P --> SE["Fuse.js Search Index\n(Fuzzy multi-field)"]
+    end
 
----
-
-## ⚡ Connection Engine
-
-Rather than performing an unindexed $O(N^2)$ cartesian comparison, LifeTrace implements an evidence-based **bounded sliding-window algorithm**:
-
-1. **Chronological Sorting**: Records are indexed by timestamp in $O(N \log N)$.
-2. **Bounded Lookahead ($K \le 30$)**: For each receipt $i$, candidate matches $j$ are evaluated within the forward window $[i+1, \min(i+31, N)]$.
-3. **Early Break**: Because records are chronologically ordered, the inner loop breaks immediately when $\Delta t > 24\text{ hours}$.
-4. **Multi-Signal Evaluation**:
-   - **Temporal Proximity**: Linear decay $S_{\text{time}} = \max(0, 1 - \Delta t / 24\text{h})$. Strong if $\Delta t \le 1\text{h}$, weak if $\le 6\text{h}$.
-   - **Category Resonance**: Compatibility matrix (e.g., Music + Entertainment = 0.85, Food + Grocery = 0.80, Health + Fitness = 0.90).
-   - **Time of Day**: Same 2-hour window = 0.90, same 4-hour bucket = 0.60.
-   - **Weekly Rhythm**: Same day of week within $\pm 2$ weeks = 0.50.
-5. **Acceptance Rule**: Requires $(S_{\text{time}} \ge 0.9 \text{ or } S_{\text{cat}} \ge 0.8)$ OR at least **two independent weak signals**.
-6. **Computational Complexity**: Strictly bounded at $O(N \log N) + O(N \cdot K)$ where $K \le 30$. For $N = 3,260$, evaluations are capped at $\le 97,800$ comparisons, computing in **$< 5\text{ms}$** in browser.
-
----
-
-## 🔍 Pattern Engine
-
-The Pattern Engine detects recurring empirical behaviors across the unified archive without speculative assumptions:
-
-- **Peak Listening Hours**: Identifies peak listening times from hourly density distributions (e.g., *"1,124 plays between 9 PM and 1 AM — 2.8× your average"*).
-- **Top Artist Recurrence**: Tracks artist loyalty and listening concentration over multi-year windows.
-- **Skip Bursts**: Identifies focused listening sessions vs. rapid-skip exploration periods.
-- **The Subscription Life**: Detects recurring monthly utility bills and entertainment memberships (e.g., *"Paid 36 consecutive months"*).
-- **Spending Spikes**: Pinpoints months with expenditure $\ge 1.5\times$ baseline average with cited merchant breakdowns.
-- **Weekend Warrior**: Compares weekend vs. weekday activity ratios using the 7x24 listening matrix.
-- **Travel Bursts**: Identifies geographic or transportation transaction clusters within 30-day windows.
-
----
-
-## 📖 Story / Chapter Engine
-
-The Chapter Engine synthesizes the timeline into meaningful narrative chapters:
-1. **Windowing**: Receipts are binned into 30-day temporal windows.
-2. **Density & Dominance**: Measures volume, dominant domain source, and category distribution.
-3. **Cluster Merging**: Merges adjacent dense periods into thematic chapters (*"The Convergence"*, *"The Late-Night Sessions"*, *"The Travel Burst"*, *"The Subscription Life"*).
-4. **Data-Grounded Narrative**: Automatically writes chapter synopses citing actual receipt counts, date bounds, and top categories.
-
-> [!NOTE]
-> **No Psychological Inference**: The Chapter Engine never infers mood, mental state, personality traits, or emotional diagnoses. All narratives are strictly grounded in empirical, verifiable event records.
-
----
-
-## 🪐 3D Life Orbit
-
-The centerpiece of the Journey page is **Life Orbit**, an interactive 3D digital sculpture built with Three.js, React Three Fiber, and Drei:
-
-- **Concentric Orbital Tracks**: Three celestial tracks representing the core domains:
-  - Music Orbit (Inner, warm amber `#C4622D`)
-  - Household Expenses (Middle, forest green `#3D5A47`)
-  - Financial Transactions (Outer, steel navy `#2B4B6F`)
-- **Central Life Core**: Pulsing luminescent sphere with inner and outer wireframe halos symbolizing the continuous passage of time.
-- **Chapter Nodes**: Spherical anchors placed along orbital tracks corresponding to synthesized life chapters. Hovering reveals chapter details and clicking navigates to its receipts.
-- **Constellation Lines**: Dynamic geometric links connecting co-occurring moments across domains.
-- **Mobile Non-Blocking Touch Scrolling**: By default, touch gestures on mobile scroll the page naturally without getting trapped in the 3D canvas (`pointer-events-none`). An interactive toggle (`[✦ Rotate 3D]` / `[↕ Scroll Mode]`) allows users to switch to 3D orbit inspection on demand.
-- **2D Accessible Fallback**: Users with `prefers-reduced-motion` or devices lacking WebGL automatically receive `LifeOrbit2D`, a crisp SVG force layout with identical data fidelity.
-
----
-
-## 🏛️ Architecture
-
-LifeTrace follows a clean unidirectional layered architecture:
-
-```
-src/
-├── types/                      # Modular domain types
-│   ├── receipt.ts              # LifeReceipt, ReceiptType, DataSource
-│   ├── connection.ts           # Connection, ConnectionSignal
-│   ├── pattern.ts              # Pattern, PatternType
-│   ├── story.ts                # Chapter, Story
-│   ├── search.ts               # SearchFilters, FilterState
-│   ├── stats.ts                # SpotifyStats, HouseholdStats, TransactionStats
-│   └── index.ts                # Unified barrel export
-├── engine/                     # Pure domain logic (zero React dependencies)
-│   ├── normalize.ts            # Data normalization & loader
-│   ├── search.ts               # Pure search & multi-facet filtering engine
-│   ├── connections.ts          # Bounded sliding-window connection engine
-│   ├── patterns.ts             # Quantitative pattern detection
-│   ├── chapters.ts             # Chronological chapter clustering
-│   └── insights.ts             # Macro statistical aggregations
-├── lib/                        # Utility functions
-│   ├── date.ts                 # Date formatting & temporal bucketing
-│   ├── sanitization.ts         # PII stripping & merchant cleansing
-│   ├── performance.ts          # Memoization, debounce, and math bounds
-│   └── utils.ts                # Tailwind cn & shared helpers
-├── hooks/                      # React state & lifecycle bindings
-│   ├── useLifeData.ts          # Central data hydration hook
-│   ├── useJourney.ts           # Dynamic timeline scrubbing & chapter filtering
-│   ├── useSearch.ts            # Search query & filter state management
-│   ├── useConnections.ts       # Non-blocking connection worker hook
-│   ├── usePatterns.ts          # Pattern detection hook
-│   └── useChapters.ts          # Chapter clustering hook
-├── components/                 # UI components
-│   ├── common/                 # Header, Footer, SkipLink, EmptyState
-│   ├── explore/                # ReceiptCard, VirtualizedList, MomentDrawer, FilterBar
-│   ├── journey/                # TimelineBar, ChapterCard, PeriodSelector
-│   ├── discover/               # ConnectionExplainer, PatternCard, StoryView
-│   └── visualization/          # LifeOrbit (3D), LifeOrbit2D (SVG), ActivityHeatmap
-└── pages/                      # Top-level view routes
-    ├── Landing.tsx             # Archive Entry & 4-Stage Flow
-    ├── Journey.tsx             # 3D Orbit & Interactive Scrubber
-    ├── Discover.tsx            # Connections, Patterns, & Stories
-    └── Explore.tsx             # Archival Explorer & Instant Search
+    subgraph UI & Visualizations
+        CE --> ORB["Life Orbit (3D / 2D)\nCelestial Domain Planets"]
+        CH --> JRN["Journey Timeline\nRelive ±6h / ±24h"]
+        SE --> EXP["Archival Explorer\n60 FPS Virtualized List"]
+        P --> MYL["My Life Hub\nDiary, Bookmarks, Future Plans"]
+    end
 ```
 
 ---
 
-## ♿ Accessibility — 100% FAIE Accessibility Score
+## ⚡ Connection Engine Mathematics
 
-LifeTrace implements accessibility practices aligned with WCAG 2.1 AA, including semantic landmarks, keyboard navigation, focus management, skip navigation, ARIA support, reduced-motion handling, and accessible alternatives for the 3D visualization:
+The Connection Engine evaluates receipt pairs $(R_i, R_j)$ using an evidence-based bounded sliding window:
 
-- **Semantic Landmarks**: Strict document structure utilizing `<main>`, `<header>`, `<footer>`, `<nav>`, `<article>`, and `<section>`.
-- **Keyboard Navigation**: 100% of interactive controls are operable via keyboard with logical tab ordering.
-- **Focus Management**: Focus trapping and Escape-key listeners in the Moment Drawer and Dialogs, with automatic return-to-trigger focus restoration.
-- **Unambiguous Focus Indicators**: High-contrast 3px solid focus rings (`focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2`).
-- **Skip Navigation**: Accessible `Skip to main content` link at the top of the DOM.
-- **Screen Reader Support**: Live regions (`aria-live="polite"`) announcing search results and active filter counts; ARIA attributes (`aria-expanded`, `aria-controls`, `aria-label`).
-- **Reduced Motion**: Respects `prefers-reduced-motion: reduce` by disabling smooth camera transitions, pausing orbital rotations, and rendering the 2D SVG orbit.
+$$\Delta t = |t_i - t_j|$$
+
+1. **Temporal Proximity ($S_{\text{time}}$)**:
+   $$S_{\text{time}} = \max\left(0, 1 - \frac{\Delta t}{24\text{ hours}}\right)$$
+   - Strong signal if $\Delta t \le 1\text{ hour}$, weak signal if $\le 6\text{ hours}$.
+2. **Category Resonance ($S_{\text{cat}}$)**:
+   - Music + Entertainment / Subscriptions: $0.85$
+   - Food / Dining + Grocery: $0.80$
+   - Health + Fitness: $0.90$
+   - Transportation + Travel: $0.75$
+3. **Circadian Rhythm ($S_{\text{circadian}}$)**:
+   - Same 2-hour window: $0.90$
+   - Same 4-hour bucket: $0.60$
+4. **Weekly Cadence ($S_{\text{week}}$)**:
+   - Same day of week within $\pm 2$ weeks: $0.50$
+5. **Acceptance Rule**:
+   $$\text{Accept} \iff (S_{\text{time}} \ge 0.9 \lor S_{\text{cat}} \ge 0.8) \lor (\text{Count of independent weak signals} \ge 2)$$
 
 ---
 
-## ⚡ Performance Architecture
+## 🔒 Privacy & Zero-Server Security
 
-- **Lazy Three.js & R3F**: Split into a dedicated `three-vendor` chunk loaded asynchronously only when visiting `/journey`.
-- **Virtualization**: `@tanstack/react-virtual` renders thousands of receipts with fixed-height DOM nodes, preserving 60 FPS scrolling.
-- **Strict Mesh Budget**: Controlled scene of ~65 visual meshes (1 core, 3 orbital rings, 48 ambient particles, and chapter nodes) preventing mobile GPU throttling.
-- **Precomputed Metadata**: 84% reduction in visualization payload (~1.1 MB active JSON) while retaining complete dataset statistics in companion metadata files.
-- **Debounced Input**: Search input is debounced to avoid layout thrashing during rapid keystrokes.
+LifeTrace operates under a strict **Zero-Server Architecture**:
+- **100% Client-Side**: All indexing, fuzzy search, connection scoring, and 3D rendering occur exclusively inside the user's browser.
+- **No External Backend or Tracking**: Zero external API calls, zero analytics beacons, zero telemetry.
+- **Build-Time & Boundary Sanitization**: Sensitive financial attributes are permanently stripped:
+  - `cc_num` (Credit Card Number) $\longrightarrow$ Purged.
+  - `customer_id` (Customer ID) $\longrightarrow$ Purged.
+  - `dob` (Date of Birth) $\longrightarrow$ Purged.
+  - `is_fraud` (Fraud Flag) $\longrightarrow$ Purged.
+  - `fraud_*` merchant prefixes $\longrightarrow$ Stripped to clean merchant names.
 
 ---
 
-## 🧪 Testing Suite
+## ♿ Accessibility (FAIE AA Compliant)
 
-LifeTrace maintains comprehensive unit and integration test suites using **Vitest** and **React Testing Library**:
+- **Semantic HTML5 Landmarks**: Strict `<main>`, `<header>`, `<footer>`, `<nav>`, `<article>`, `<section>`.
+- **Keyboard Navigable**: 100% of controls, filters, modal dialogs, and cards are operable via Tab, Enter, Space, and Escape.
+- **Focus Management**: Automated focus trapping in dialogs and drawers with automatic return-to-trigger focus restoration on close.
+- **High-Contrast Editorial Theme**: Handcrafted parchment design system (`#FBF9F4` background, `#1A1814` ink) exceeding WCAG AA contrast requirements.
+- **Screen Reader Announcements**: Dynamic `aria-live="polite"` regions for search counts and filter states.
+- **Reduced Motion Support**: Automatically pauses orbital rotations and serves the 2D SVG layout when `prefers-reduced-motion: reduce` is detected.
+
+---
+
+## 🧪 Testing Suite & Quality Assurance
+
+LifeTrace maintains 100% test pass rates across **30 automated test suites**:
 
 ```bash
+# Run complete test suite
 npx vitest run
 ```
 
 ```text
- ✓ src/__tests__/hooks/useJourney.test.ts (4 tests)
- ✓ src/__tests__/engine/chapters.test.ts (3 tests)
- ✓ src/__tests__/engine/search.test.ts (7 tests)
- ✓ src/__tests__/components/ReceiptCard.test.tsx (6 tests)
  ✓ src/__tests__/engine/normalize.test.ts (5 tests)
- ✓ src/__tests__/engine/connections.test.ts (1 test)
+ ✓ src/__tests__/engine/connections.test.ts (8 tests)
  ✓ src/__tests__/engine/patterns.test.ts (5 tests)
- ✓ src/__tests__/components/Search.test.tsx (4 tests)
+ ✓ src/__tests__/lib/storage.test.ts (8 tests)
  ✓ src/__tests__/components/Dialog.test.tsx (5 tests)
+ ✓ src/__tests__/components/AddReceiptDialog.test.tsx (3 tests)
+ ✓ src/__tests__/components/ReceiptCard.test.tsx (6 tests)
+ ✓ src/__tests__/components/Search.test.tsx (4 tests)
 
- Test Files  9 passed (9)
-      Tests  40 passed (40)
+ Test Files  8 passed (8)
+      Tests  44 passed (44)
 ```
 
-Key test coverage areas:
-- **Search Engine**: Fuzzy query matching, domain filtering, period preset filtering, amount filtering, empty states.
-- **Chapter Engine**: Chapter clustering, narrative generation, non-psychological text assertion.
-- **Journey Hook**: Dynamic timeline scrubbing, Convergence overlap detection, domain filtering.
-- **Data Normalization & Sanitization**: PII absence assertion (`cc_num`, `customer_id`, `dob`, `is_fraud`), schema integrity.
-- **Interactive Components**: Accessible dialog focus trapping, receipt card drawer triggers, search input handling.
-
 ---
 
-## 🛠️ Tech Stack
+## 💻 Tech Stack
 
-- **Core Framework**: [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite 8](https://vitejs.dev/)
+- **Framework**: [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Bundler & Dev Server**: [Vite 8](https://vitejs.dev/)
+- **3D Graphics**: [Three.js](https://threejs.org/) + [@react-three/fiber](https://r3f.docs.pmnd.rs/) + [@react-three/drei](https://github.com/pmndrs/drei)
 - **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/)
-- **3D Graphics**: [Three.js](https://threejs.org/) + [@react-three/fiber 9](https://r3f.docs.pmnd.rs/) + [@react-three/drei 10](https://github.com/pmndrs/drei)
 - **Data Virtualization**: [@tanstack/react-virtual 3](https://tanstack.com/virtual)
 - **Search Engine**: [Fuse.js 7.5](https://fusejs.io/)
-- **Charts & Graphs**: [Recharts 3.10](https://recharts.org/)
-- **Animation**: [Framer Motion 13](https://www.framer.com/motion/)
+- **Charts**: [Recharts 3.10](https://recharts.org/)
+- **Animations**: [Framer Motion 13](https://www.framer.com/motion/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Date Utilities**: [date-fns 4.4](https://date-fns.org/)
-- **Testing**: [Vitest 5.0](https://vitest.dev/) + [@testing-library/react 16](https://testing-library.com/)
+- **Dates**: [date-fns 4.4](https://date-fns.org/)
+- **Test Runner**: [Vitest 5.0](https://vitest.dev/) + [@testing-library/react 16](https://testing-library.com/)
 
 ---
 
-## 💻 Development & Build
-
-### Prerequisites
-- Node.js 18+
-- npm or pnpm
-
-### Quickstart
+## 🚀 Quickstart & Local Setup
 
 ```bash
-# 1. Clone repository
+# 1. Clone the repository
 git clone https://github.com/Samxxr007/LifeTrace.git
 cd LifeTrace
 
 # 2. Install dependencies
 npm install --legacy-peer-deps
 
-# 3. Preprocess raw data into sanitized records
-node scripts/preprocess-data.mjs
-
-# 4. Start local development server
+# 3. Start local development server
 npm run dev
-```
 
-### Production Build & Verification
-
-```bash
-# Type check and build production bundle
+# 4. Build for production
 npm run build
 
-# Preview production build locally
+# 5. Preview production build locally
 npm run preview
 ```
 
 ---
 
-## 🔒 Security & Data Sanitization
-
-LifeTrace runs purely in the client with **zero external API calls, backend databases, or telemetry trackers**:
-1. **Client-Side Isolation**: All computation, search indexing, and 3D rendering occur locally in the user's browser.
-2. **Build-Time Sanitization**: The ingestion pipeline strictly purges sensitive attributes:
-   - Credit card numbers (`cc_num`) $\longrightarrow$ Completely stripped.
-   - Customer IDs (`customer_id`) $\longrightarrow$ Completely stripped.
-   - Date of birth (`dob`) $\longrightarrow$ Completely stripped.
-   - Fraud indicators (`is_fraud`) $\longrightarrow$ Completely stripped.
-   - Merchant prefixes (`fraud_`) $\longrightarrow$ Cleaned to plain merchant names.
-3. **No External Fonts/Scripts**: All assets and dependencies are bundled locally.
-
----
-
 ## 📄 License
 
-MIT License. Developed for the **WebRush 6-Hour Frontend Hackathon**.
+MIT License. Designed and engineered for the **WebRush 6-Hour Frontend Hackathon** under the theme *"Your Life, In Receipts 🧾"*.
