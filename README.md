@@ -62,7 +62,7 @@ LifeTrace integrates three diverse digital life datasets spanning **11 years (20
 | **Total** | **2013 – 2024** | **32,321 records** | **3,260 records (~1.1 MB)** | **Complete Precomputed Stats** | **84% payload reduction** while preserving 100% statistical fidelity. |
 
 ### The Convergence (2015–2018)
-The dataset contains an intentional, verifiable temporal overlap between **January 2015 and September 2018**, where Spotify streaming and Household expenditures occurred concurrently. LifeTrace highlights this period as **The Convergence**, revealing how music accompanied daily living costs.
+The Convergence highlights the 2015–2018 period where Spotify listening records and household expense records occur concurrently.
 
 ---
 
@@ -194,9 +194,9 @@ src/
 
 ---
 
-## ♿ Accessibility Commitments (100% FAIE Score)
+## ♿ Accessibility — 100% FAIE Accessibility Score
 
-LifeTrace earned a **100% Accessibility score** in FAIE evaluation through rigorous adherence to WCAG 2.1 AA standards:
+LifeTrace implements accessibility practices aligned with WCAG 2.1 AA, including semantic landmarks, keyboard navigation, focus management, skip navigation, ARIA support, reduced-motion handling, and accessible alternatives for the 3D visualization:
 
 - **Semantic Landmarks**: Strict document structure utilizing `<main>`, `<header>`, `<footer>`, `<nav>`, `<article>`, and `<section>`.
 - **Keyboard Navigation**: 100% of interactive controls are operable via keyboard with logical tab ordering.
