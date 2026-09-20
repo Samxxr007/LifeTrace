@@ -59,10 +59,17 @@ LifeTrace integrates three diverse digital life datasets spanning **11 years (20
 | **Spotify Streaming History** | Dec 2013 – Jan 2024 | 20,443 scrobbles | 1,500 representative records | Yes (`spotify-stats.json`) | Music listening logs including track, artist, album, ms played, skip status, and hour distribution. |
 | **Household Expenses** | Jan 2015 – Sep 2018 | 2,461 expenses | 1,000 representative records | Yes (`household-stats.json`) | Real-world daily domestic expenses, grocery bills, utilities, and subscription payments. |
 | **Financial Transactions** | Jan 2022 – Dec 2024 | 9,417 transactions | 760 representative records | Yes (`transactions-stats.json`) | Digital commerce records across retail, travel, food, entertainment, and health. |
-| **Total** | **2013 – 2024** | **32,321 records** | **3,260 records (~1.1 MB)** | **Complete Precomputed Stats** | **84% payload reduction** while preserving 100% statistical fidelity. |
+| **Synthetic Enrichment** | 2016 – 2024 | 285 records | 285 records (~120 KB) | Yes | Deterministic multi-domain scenarios (Places, Movies, Photos, Messages, Searches, Events, Notes). |
+| **Total Archive** | **2013 – 2024** | **32,606 records** | **3,548 records (~1.2 MB)** | **Complete Precomputed Stats** | **Rich cross-domain life archive with verifiable provenance.** |
 
 ### The Convergence (2015–2018)
 The Convergence highlights the 2015–2018 period where Spotify listening records and household expense records occur concurrently.
+
+### Deterministic Synthetic Enrichment Layer
+To authentically fulfill the hackathon's "Your Life, In Receipts 🧾" brief across all 10 digital life domains (Music, Transactions, Expenses, Places, Movies, Photos, Messages, Searches, Events, Notes) without inventing arbitrary random filler, LifeTrace incorporates a **seeded deterministic synthetic enrichment layer** (`src/data/synthetic/scenarios.ts`):
+- **36 Coherent Life Scenarios**: Spans 8 realistic life scenario families (Cafe Study, Movie Night, Weekend Roadtrip, Tech Fest, Marathon Training, Airport Transit, Dinner Feast, Workspace Setup).
+- **285 Structured Moments**: Each scenario produces a temporally and geographically coherent chain of receipts with deterministic minute offsets and consistent cities (Chennai, Bangalore, Pondicherry, Mumbai).
+- **Explicit Provenance**: All enriched records carry `provenance: "synthetic"`, `source: "synthetic"`, and a stable `scenarioId` (`scenario-xxx`), ensuring full transparency. Original records strictly preserve `provenance: "source"`.
 
 ---
 

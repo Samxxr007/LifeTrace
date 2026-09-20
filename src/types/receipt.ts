@@ -4,8 +4,12 @@ export type ReceiptType =
   | 'transaction'
   | 'place'
   | 'entertainment'
-  | 'note'
-  | 'event';
+  | 'movie'
+  | 'photo'
+  | 'message'
+  | 'search'
+  | 'event'
+  | 'note';
 
 export type DataSource =
   | 'spotify'
@@ -14,11 +18,14 @@ export type DataSource =
   | 'synthetic'
   | 'derived';
 
+export type DataProvenance = 'source' | 'synthetic' | 'derived';
+
 export type ExpenseType = 'Expense' | 'Income' | 'Transfer-Out';
 
 export interface LifeLocation {
   city?: string;
   state?: string;
+  locationName?: string;
   lat?: number;
   long?: number;
 }
@@ -27,6 +34,7 @@ export interface LifeReceipt {
   id: string;
   type: ReceiptType;
   source: DataSource;
+  provenance: DataProvenance;
   timestamp: string; // ISO 8601 string
   title: string;
   description?: string;
@@ -36,6 +44,7 @@ export interface LifeReceipt {
   currency?: string;
   expenseType?: ExpenseType;
   location?: LifeLocation;
+  scenarioId?: string;
   metadata: {
     // Music
     artist?: string;
@@ -44,11 +53,19 @@ export interface LifeReceipt {
     msPlayed?: number;
     skipped?: boolean;
     shuffle?: boolean;
-    // Expense
+    // Movie
+    movie?: string;
+    // Expense / Transaction
     paymentMode?: string;
-    note?: string;
-    // Transaction
     merchant?: string;
+    note?: string;
+    // Place
+    placeName?: string;
+    city?: string;
+    // Communication / Search / Photo
+    messageText?: string;
+    searchQuery?: string;
+    photoCaption?: string;
     // Open
     [key: string]: unknown;
   };

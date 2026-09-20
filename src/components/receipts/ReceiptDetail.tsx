@@ -62,11 +62,17 @@ export function ReceiptDetail({ receipt, connections = [], allReceipts = [], onC
         )}
         {renderField('Artist', metadata?.artist)}
         {renderField('Album', metadata?.album)}
+        {renderField('Movie', metadata?.movie)}
         {renderField('Platform', metadata?.platform)}
         {renderField('Merchant', metadata?.merchant)}
         {renderField('Payment mode', metadata?.paymentMode)}
+        {renderField('Search query', metadata?.searchQuery)}
+        {renderField('Photo caption', metadata?.photoCaption)}
+        {renderField('Message', metadata?.messageText)}
         {locationStr && renderField('Location', locationStr)}
+        {location?.city && !locationStr && renderField('City', location.city)}
         {metadata?.note && renderField('Note', String(metadata.note))}
+        {receipt.scenarioId && renderField('Scenario ID', receipt.scenarioId)}
       </div>
 
       {/* Connected Moments */}
@@ -143,11 +149,23 @@ export function ReceiptDetail({ receipt, connections = [], allReceipts = [], onC
         )}
       </div>
 
-      {/* Footer — Data source */}
-      <div className="pt-4 border-t border-ink-300 text-center">
-        <p className="font-mono text-xs text-ink-400">
-          Source: <span className="capitalize">{source?.replace(/_/g, ' ') || 'Unknown'}</span>
+      {/* Footer — Provenance & Origin */}
+      <div className="pt-4 border-t border-ink-300 flex justify-between items-center text-xs font-mono text-ink-500">
+        <p>
+          Data Origin:{' '}
+          <span className="font-semibold text-ink-800">
+            {receipt.provenance === 'synthetic'
+              ? 'Synthetic enrichment'
+              : receipt.provenance === 'derived'
+              ? 'Derived insight'
+              : `${receipt.source?.replace(/_/g, ' ')} dataset`}
+          </span>
         </p>
+        {receipt.scenarioId && (
+          <span className="text-[11px] text-ink-400">
+            {receipt.scenarioId}
+          </span>
+        )}
       </div>
     </div>
   );

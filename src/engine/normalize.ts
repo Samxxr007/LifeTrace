@@ -1,4 +1,5 @@
 import { LifeReceipt, SpotifyStats, HouseholdStats, TransactionStats, DataManifest } from '@/types';
+import { loadSyntheticReceipts } from '@/data/synthetic/scenarios';
 
 import spotifyData from '@/data/spotify-sample.json';
 import householdData from '@/data/household.json';
@@ -28,6 +29,7 @@ const sanitizeRecord = (record: any, source: string): LifeReceipt => {
     id: record.id,
     type: record.type,
     source: source as any,
+    provenance: 'source',
     timestamp: record.timestamp,
     title: record.title,
     description: record.description,
@@ -60,12 +62,15 @@ export const loadTransactionReceipts = (): LifeReceipt[] => {
   return cachedTransactionReceipts;
 };
 
+export { loadSyntheticReceipts } from '@/data/synthetic/scenarios';
+
 export const loadAllReceipts = (): LifeReceipt[] => {
   if (cachedAllReceipts) return cachedAllReceipts;
   const all = [
     ...loadSpotifyReceipts(),
     ...loadHouseholdReceipts(),
-    ...loadTransactionReceipts()
+    ...loadTransactionReceipts(),
+    ...loadSyntheticReceipts(),
   ];
   cachedAllReceipts = all.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   return cachedAllReceipts;

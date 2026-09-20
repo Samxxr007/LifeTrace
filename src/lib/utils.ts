@@ -134,6 +134,10 @@ export const TYPE_LABELS: Record<ReceiptType, string> = {
   transaction: 'Transaction',
   place: 'Place',
   entertainment: 'Entertainment',
+  movie: 'Movie',
+  photo: 'Photo',
+  message: 'Message',
+  search: 'Search',
   note: 'Note',
   event: 'Event',
 };
@@ -152,6 +156,10 @@ export const TYPE_COLORS: Record<ReceiptType, string> = {
   transaction:   '#2B4B6F', // navy-500
   place:         '#8B6914', // amber-500
   entertainment: '#8B3A3A', // crimson-500
+  movie:         '#8B3A3A', // crimson-500
+  photo:         '#7B4B94', // purple-500
+  message:       '#2E6F60', // teal-500
+  search:        '#A05A2C', // copper-500
   note:          '#8A8480', // ink-500
   event:         '#5E2626', // crimson-700
 };
@@ -162,6 +170,10 @@ export const TYPE_BG_COLORS: Record<ReceiptType, string> = {
   transaction:   '#DCE5EF',
   place:         '#F5EDCC',
   entertainment: '#F5DADA',
+  movie:         '#F5DADA',
+  photo:         '#F0E5F5',
+  message:       '#DCF2EC',
+  search:        '#FDEFE5',
   note:          '#F0EDE8',
   event:         '#F5DADA',
 };

@@ -1,8 +1,19 @@
 import React from 'react';
-import { Music2, Receipt, CreditCard, MapPin, Clapperboard, FileText, Calendar, HelpCircle } from 'lucide-react';
+import { 
+  Music2, 
+  Receipt, 
+  CreditCard, 
+  MapPin, 
+  Clapperboard, 
+  FileText, 
+  Calendar, 
+  Camera, 
+  MessageSquare, 
+  Search, 
+  HelpCircle 
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-export type ReceiptType = 'music' | 'expense' | 'transaction' | 'place' | 'entertainment' | 'note' | 'event';
+import type { ReceiptType } from '@/types';
 
 interface ReceiptTypeIconProps {
   type: ReceiptType | string;
@@ -22,7 +33,14 @@ export function ReceiptTypeIcon({ type, size = 20, className }: ReceiptTypeIconP
       case 'place':
         return { icon: MapPin, color: 'text-amber-500' };
       case 'entertainment':
+      case 'movie':
         return { icon: Clapperboard, color: 'text-crimson-500' };
+      case 'photo':
+        return { icon: Camera, color: 'text-purple-500' };
+      case 'message':
+        return { icon: MessageSquare, color: 'text-teal-600' };
+      case 'search':
+        return { icon: Search, color: 'text-amber-700' };
       case 'note':
         return { icon: FileText, color: 'text-ink-500' };
       case 'event':

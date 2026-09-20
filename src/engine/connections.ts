@@ -1,22 +1,25 @@
-import { LifeReceipt, Connection, ConnectionSignal } from '@/types';
-import { scoreToStrength, getTimeBucket, DAY_NAMES } from '@/lib/utils';
+import { LifeReceipt, Connection, ConnectionSignal, ConnectionStrength } from '@/types';
+import { getTimeBucket, DAY_NAMES } from '@/lib/utils';
 
 /**
- * Connection Discovery Algorithm:
+ * Multi-Domain Connection Discovery Engine
  *
- * 1. Pre-indexing & Sorting: O(N log N) by timestamp.
- *    Pre-computes numeric epoch milliseconds, hour, day-of-week, and time bucket in a single O(N) pass.
- * 2. Bounded Lookahead Temporal Sliding Window:
- *    For each record i, evaluates forward candidates j in [i+1, min(i+31, N)].
- *    Because records are sorted chronologically, the inner loop terminates immediately when diffHours > 24.
- * 3. Bidirectional Indexing:
- *    Every discovered connection is indexed under both sourceId and targetId in a Map<string, Connection[]>,
- *    enabling O(1) lookup when inspecting any receipt in the archival explorer or story views.
+ * Evaluates multi-signal evidence across all 10 life receipt domains:
+ * 1. Temporal Proximity (diffHours <= 1, <= 6, <= 24)
+ * 2. Location Coherence (same city, same place)
+ * 3. Domain & Category Resonance (Music ↔ Transaction, Movie ↔ Place, etc.)
+ * 4. Shared Semantic Tags (coffee, cinema, travel, etc.)
+ * 5. Time of Day (same 2h window, same 4h bucket)
+ * 6. Weekly Rhythm (same day of week within +-14 days)
+ * 7. Scenario Context (shared deterministic scenarioId)
  *
- * Complexity:
- * - Time: O(N log N) sorting + O(N · K) sliding window where K <= 30.
- *   For N = 3,260, comparisons are strictly bounded at <= 97,800 checks, executing in < 25ms.
- * - Space: O(N) indexed cache.
+ * Strength Classification:
+ * - STRONG: 3+ meaningful independent signals, or very close temporal (<=30m) + domain/city resonance
+ * - MODERATE: 2 meaningful independent signals
+ * - WEAK: <2 signals (filtered out to preserve high-confidence discovery)
+ *
+ * Complexity: O(N log N) sort + O(N · K) sliding window with K <= 30.
+ * Pre-computes numeric timestamps and builds a bidirectional O(1) Map index.
  */
 
 let lastReceiptsRef: LifeReceipt[] | null = null;
@@ -38,7 +41,7 @@ function buildIndex(connections: Connection[]): Map<string, Connection[]> {
 export function findConnections(receipts: LifeReceipt[], maxConnections?: number): Connection[] {
   if (!receipts || receipts.length === 0) return [];
 
-  // Invalidate cache if receipts array reference changed (e.g., in unit tests or when switching datasets)
+  // Invalidate cache if receipts array reference changed
   if (receipts !== lastReceiptsRef) {
     cachedAllConnections = null;
     cachedConnectionIndex = null;
@@ -52,16 +55,21 @@ export function findConnections(receipts: LifeReceipt[], maxConnections?: number
     return cachedAllConnections;
   }
 
-  // Sort and pre-compute timestamps and time properties in a single O(N) pass
+  // Pre-index records in a single O(N) pass
   const prepared = receipts
-    .map(r => {
+    .map((r) => {
       const d = new Date(r.timestamp);
       const time = d.getTime();
       const hour = d.getHours();
       const bucket = getTimeBucket(hour);
       const day = d.getDay();
-      const category = r.type === 'music' ? 'music' : (r.category || r.type).toLowerCase();
-      return { r, time, hour, bucket, day, category };
+      const category = (r.category || r.type || '').toLowerCase();
+      const type = r.type;
+      const city = r.location?.city || '';
+      const placeName = r.location?.locationName || (r.metadata?.placeName as string) || '';
+      const tags = new Set((r.tags || []).map((t) => t.toLowerCase()));
+      const scenarioId = r.scenarioId || '';
+      return { r, time, hour, bucket, day, type, category, city, placeName, tags, scenarioId };
     })
     .sort((a, b) => a.time - b.time);
 
@@ -75,51 +83,175 @@ export function findConnections(receipts: LifeReceipt[], maxConnections?: number
       const b = prepared[j];
       const diffHours = (b.time - a.time) / (1000 * 60 * 60);
 
-      if (diffHours > 24) break; // Because it's sorted, subsequent items are even farther
+      // Chronologically sorted: subsequent items will be even farther
+      if (diffHours > 24) break;
 
       const signals: (ConnectionSignal & { score: number })[] = [];
 
-      // 1. TEMPORAL PROXIMITY
-      const tempScore = Math.max(0, 1 - diffHours / 24);
-      if (tempScore > 0) {
+      // ─── 1. TEMPORAL PROXIMITY ──────────────────────────────────────────────
+      const diffMinutes = Math.max(1, Math.round(diffHours * 60));
+      if (diffHours <= 0.5) {
         signals.push({
           type: 'temporal_proximity',
           weight: 1,
-          label: diffHours <= 1 
-            ? `${Math.max(1, Math.round(diffHours * 60))}m apart`
-            : `${Math.round(diffHours)}h apart`,
-          score: tempScore,
+          label: `${diffMinutes}m apart`,
+          score: 1.0,
+        });
+      } else if (diffHours <= 1.0) {
+        signals.push({
+          type: 'temporal_proximity',
+          weight: 1,
+          label: `${diffMinutes}m apart`,
+          score: 0.9,
+        });
+      } else if (diffHours <= 4.0) {
+        signals.push({
+          type: 'temporal_proximity',
+          weight: 1,
+          label: `${Math.round(diffHours)}h apart`,
+          score: 0.75,
+        });
+      } else if (diffHours <= 12.0) {
+        signals.push({
+          type: 'temporal_proximity',
+          weight: 1,
+          label: `${Math.round(diffHours)}h apart`,
+          score: 0.5,
         });
       }
 
-      // 2. CATEGORY RESONANCE
-      let catScore = 0;
-      const catA = a.category;
-      const catB = b.category;
+      // ─── 2. LOCATION / CITY COHERENCE ─────────────────────────────────────────
+      if (a.city && b.city && a.city.toLowerCase() === b.city.toLowerCase()) {
+        signals.push({
+          type: 'same_city',
+          weight: 1,
+          label: `Both in ${a.city}`,
+          score: 0.85,
+        });
+      }
+      if (a.placeName && b.placeName && a.placeName === b.placeName) {
+        signals.push({
+          type: 'same_place',
+          weight: 1,
+          label: `Both at ${a.placeName}`,
+          score: 0.95,
+        });
+      }
 
-      if ((catA === 'music' && catB.includes('subscription')) || (catB === 'music' && catA.includes('subscription'))) catScore = 0.85;
-      else if ((catA === 'music' && catB.includes('entertainment')) || (catB === 'music' && catA.includes('entertainment'))) catScore = 0.85;
-      else if ((catA.includes('food') && catB.includes('grocery')) || (catB.includes('food') && catA.includes('grocery'))) catScore = 0.8;
-      else if ((catA.includes('transport') && catB.includes('travel')) || (catB.includes('transport') && catA.includes('travel'))) catScore = 0.75;
-      else if ((catA.includes('health') && catB.includes('fitness')) || (catB.includes('health') && catA.includes('fitness'))) catScore = 0.9;
-      else if (catA.includes('entertainment') && catB.includes('entertainment')) catScore = 0.9;
+      // ─── 3. DOMAIN & CATEGORY RESONANCE ──────────────────────────────────────
+      let catScore = 0;
+      let resonanceLabel = 'Shared domain resonance';
+
+      const pairKey = [a.type, b.type].sort().join('↔');
+
+      // Cross-domain pairs
+      if (pairKey === 'music↔transaction') {
+        catScore = 0.85;
+        resonanceLabel = 'Music soundtrack during commerce';
+      } else if (pairKey === 'expense↔music') {
+        catScore = 0.85;
+        resonanceLabel = 'Music alongside daily expenses';
+      } else if (pairKey === 'music↔place') {
+        catScore = 0.8;
+        resonanceLabel = 'Listening session at place';
+      } else if (pairKey === 'movie↔transaction' || (a.category.includes('movie') && b.type === 'transaction') || (b.category.includes('movie') && a.type === 'transaction')) {
+        catScore = 0.9;
+        resonanceLabel = 'Cinema admission & dining';
+      } else if (pairKey === 'movie↔place' || (a.category.includes('movie') && b.type === 'place') || (b.category.includes('movie') && a.type === 'place')) {
+        catScore = 0.9;
+        resonanceLabel = 'Cinema theater visit';
+      } else if (pairKey === 'movie↔music') {
+        catScore = 0.85;
+        resonanceLabel = 'Film score & soundtrack';
+      } else if (pairKey === 'place↔search') {
+        catScore = 0.85;
+        resonanceLabel = 'Location search followed by visit';
+      } else if (pairKey === 'search↔transaction') {
+        catScore = 0.85;
+        resonanceLabel = 'Product/food search then purchase';
+      } else if (pairKey === 'photo↔place') {
+        catScore = 0.9;
+        resonanceLabel = 'Photo recorded at location';
+      } else if (pairKey === 'photo↔transaction') {
+        catScore = 0.85;
+        resonanceLabel = 'Photo accompanying purchase';
+      } else if (pairKey === 'event↔message') {
+        catScore = 0.85;
+        resonanceLabel = 'Communication coordinating event';
+      } else if (pairKey === 'message↔place') {
+        catScore = 0.85;
+        resonanceLabel = 'Message sent from location';
+      } else if (pairKey === 'event↔note') {
+        catScore = 0.85;
+        resonanceLabel = 'Notes on attended event';
+      } else if (pairKey === 'event↔place') {
+        catScore = 0.9;
+        resonanceLabel = 'Event hosted at venue';
+      } else if (pairKey === 'event↔transaction') {
+        catScore = 0.85;
+        resonanceLabel = 'Event participation & food';
+      } else if (pairKey === 'event↔music') {
+        catScore = 0.85;
+        resonanceLabel = 'Event playlist';
+      } else if (pairKey === 'expense↔transaction') {
+        catScore = 0.8;
+        resonanceLabel = 'Parallel financial activity';
+      } else {
+        // Intra-domain category matching
+        const catA = a.category;
+        const catB = b.category;
+        if (catA && catB) {
+          if ((catA.includes('food') && catB.includes('grocery')) || (catB.includes('food') && catA.includes('grocery'))) {
+            catScore = 0.8;
+            resonanceLabel = 'Food & grocery affinity';
+          } else if ((catA.includes('transport') && catB.includes('travel')) || (catB.includes('transport') && catA.includes('travel'))) {
+            catScore = 0.8;
+            resonanceLabel = 'Travel & transit correlation';
+          } else if ((catA.includes('health') && catB.includes('fitness')) || (catB.includes('health') && catA.includes('fitness'))) {
+            catScore = 0.9;
+            resonanceLabel = 'Health & fitness continuity';
+          } else if (catA === catB && catA.length > 2) {
+            catScore = 0.75;
+            resonanceLabel = `Both relate to ${catA}`;
+          }
+        }
+      }
 
       if (catScore > 0) {
         signals.push({
           type: 'category_resonance',
           weight: 1,
-          label: 'Shared domain resonance',
+          label: resonanceLabel,
           score: catScore,
         });
       }
 
-      // 3. TIME OF DAY
-      let timeScore = 0;
-      if (a.bucket === b.bucket) {
-        timeScore = 0.6;
-        if (Math.abs(a.hour - b.hour) <= 2) timeScore = 0.9;
+      // ─── 4. SHARED TAGS ──────────────────────────────────────────────────────
+      const commonTags: string[] = [];
+      a.tags.forEach((t) => {
+        if (b.tags.has(t)) commonTags.push(t);
+      });
+      if (commonTags.length > 0) {
+        signals.push({
+          type: 'shared_tags',
+          weight: 1,
+          label: `Shared tags: ${commonTags.slice(0, 2).join(', ')}`,
+          score: 0.75,
+        });
       }
-      if (timeScore > 0) {
+
+      // ─── 5. TIME OF DAY ──────────────────────────────────────────────────────
+      let timeScore = 0;
+      if (Math.abs(a.hour - b.hour) <= 2) {
+        timeScore = 0.85;
+        signals.push({
+          type: 'time_of_day',
+          weight: 1,
+          label: `Both around ${a.hour}:00`,
+          score: timeScore,
+        });
+      } else if (a.bucket === b.bucket) {
+        timeScore = 0.6;
         signals.push({
           type: 'time_of_day',
           weight: 1,
@@ -128,50 +260,74 @@ export function findConnections(receipts: LifeReceipt[], maxConnections?: number
         });
       }
 
-      // 4. WEEKLY RHYTHM
-      let weeklyScore = 0;
-      if (a.day === b.day && Math.abs(b.time - a.time) <= 14 * 24 * 60 * 60 * 1000) {
-        weeklyScore = 0.5;
-      }
-      if (weeklyScore > 0) {
+      // ─── 6. WEEKLY RHYTHM ────────────────────────────────────────────────────
+      if (a.day === b.day && Math.abs(b.time - a.time) <= 14 * 24 * 60 * 60 * 1000 && diffHours > 4) {
         signals.push({
           type: 'weekly_rhythm',
           weight: 1,
           label: `Weekly rhythm on ${DAY_NAMES[a.day]}`,
-          score: weeklyScore,
+          score: 0.5,
         });
       }
 
-      const scoreSum = signals.reduce((sum, s) => sum + s.weight * s.score, 0);
-      const hasStrongTemporal = diffHours <= 1;
-      const hasStrongCategory = catScore >= 0.8;
-      const weakSignalsCount = signals.filter(s => s.type !== 'temporal_proximity' || diffHours <= 6).length;
+      // ─── 7. SCENARIO CONTEXT ─────────────────────────────────────────────────
+      if (a.scenarioId && b.scenarioId && a.scenarioId === b.scenarioId) {
+        signals.push({
+          type: 'scenario_context',
+          weight: 1,
+          label: 'Coherent life scenario',
+          score: 0.9,
+        });
+      }
 
-      if (hasStrongTemporal || hasStrongCategory || weakSignalsCount >= 2) {
-        let explanation = 'These moments occurred close in time.';
-        if (hasStrongTemporal) {
-          explanation = `These moments occurred ${Math.max(1, Math.round(diffHours * 60))} minutes apart on the same ${a.bucket}.`;
-        } else if (hasStrongCategory) {
-          explanation = `Both belong to related categories and occurred within ${Math.max(1, Math.round(diffHours))} hours.`;
-        } else if (weeklyScore > 0) {
-          explanation = `This pattern recurs every ${DAY_NAMES[a.day]} ${a.bucket}.`;
+      // ─── ACCEPTANCE & STRENGTH CLASSIFICATION ─────────────────────────────────
+      // Require at least 2 independent signals
+      if (signals.length >= 2) {
+        let strength: ConnectionStrength = 'moderate';
+
+        const isVeryCloseTemporal = diffHours <= 0.75;
+        const hasStrongCategory = catScore >= 0.8;
+        const hasLocationMatch = Boolean(a.city && b.city && a.city.toLowerCase() === b.city.toLowerCase());
+
+        if (signals.length >= 3 || (isVeryCloseTemporal && (hasStrongCategory || hasLocationMatch))) {
+          strength = 'strong';
+        } else {
+          strength = 'moderate';
         }
+
+        // Build human-readable factual explanation
+        let explanation = 'These moments occurred close in time.';
+        if (diffHours <= 1) {
+          explanation = `These moments occurred ${diffMinutes} minutes apart on the same ${a.bucket}.`;
+        } else if (catScore >= 0.8) {
+          explanation = `${resonanceLabel} within ${Math.round(diffHours)} hours.`;
+        } else if (signals.some((s) => s.type === 'same_city')) {
+          explanation = `Both moments occurred in ${a.city} within ${Math.round(diffHours)} hours.`;
+        } else if (signals.some((s) => s.type === 'weekly_rhythm')) {
+          explanation = `This pattern recurs on ${DAY_NAMES[a.day]} ${a.bucket}.`;
+        }
+
+        const scoreSum = signals.reduce((sum, s) => sum + s.weight * s.score, 0);
 
         connections.push({
           id: `${a.r.id}-${b.r.id}`,
           sourceId: a.r.id,
           targetId: b.r.id,
-          score: Math.min(1, scoreSum),
-          signals: signals.map(s => ({ type: s.type, weight: s.weight, label: s.label })),
+          score: Math.min(1, scoreSum / Math.max(1, signals.length)),
+          signals: signals.map((s) => ({ type: s.type, weight: s.weight, label: s.label })),
           explanation,
-          strength: scoreToStrength(Math.min(1, scoreSum)),
+          strength,
         });
       }
     }
   }
 
-  // Sort with diversity: cross-domain relationships given prominence while respecting score
-  connections.sort((a, b) => b.score - a.score);
+  // Prioritize diverse cross-domain connections and strong confidence
+  connections.sort((a, b) => {
+    if (a.strength === 'strong' && b.strength !== 'strong') return -1;
+    if (b.strength === 'strong' && a.strength !== 'strong') return 1;
+    return b.score - a.score;
+  });
 
   cachedAllConnections = connections;
   cachedConnectionIndex = buildIndex(connections);
@@ -198,7 +354,7 @@ export function getConnectionsForReceipt(receiptId: string, allConnections?: Con
 
   // 2. Direct filter if explicit connection list provided
   if (allConnections && allConnections.length > 0) {
-    return allConnections.filter(c => c.sourceId === receiptId || c.targetId === receiptId);
+    return allConnections.filter((c) => c.sourceId === receiptId || c.targetId === receiptId);
   }
 
   return [];

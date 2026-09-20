@@ -4,7 +4,11 @@ export type ConnectionSignalType =
   | 'time_of_day'
   | 'weekly_rhythm'
   | 'location_cluster'
-  | 'cross_domain';
+  | 'cross_domain'
+  | 'same_city'
+  | 'same_place'
+  | 'shared_tags'
+  | 'scenario_context';
 
 export interface ConnectionSignal {
   type: ConnectionSignalType;

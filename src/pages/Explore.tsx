@@ -12,8 +12,19 @@ import { getConnectionsForReceipt } from '@/engine/connections';
 import type { LifeReceipt, ReceiptType, DataSource } from '@/types';
 import { TYPE_LABELS, SOURCE_LABELS } from '@/lib/utils';
 
-const RECEIPT_TYPES: ReceiptType[] = ['music', 'expense', 'transaction'];
-const DATA_SOURCES: DataSource[] = ['spotify', 'household', 'transactions'];
+const RECEIPT_TYPES: ReceiptType[] = [
+  'music',
+  'transaction',
+  'expense',
+  'place',
+  'movie',
+  'photo',
+  'message',
+  'search',
+  'event',
+  'note',
+];
+const DATA_SOURCES: DataSource[] = ['spotify', 'household', 'transactions', 'synthetic'];
 
 const YEAR_PRESETS = [
   { label: 'All Eras', range: [null, null] as [string | null, string | null] },
