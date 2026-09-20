@@ -4,6 +4,8 @@ import { formatDate, formatAmount, formatDateRange } from '@/lib/utils';
 import { ReceiptTypeIcon } from './ReceiptTypeIcon';
 import { Badge } from '../ui/Badge';
 import { EmptyConnections } from '../ui/EmptyState';
+import { BookmarkButton } from '../common/BookmarkButton';
+import { FeatureButton } from '../common/FeatureButton';
 
 interface ReceiptDetailProps {
   receipt: LifeReceipt;
@@ -37,12 +39,28 @@ export function ReceiptDetail({ receipt, connections = [], allReceipts = [], onC
         <div className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-parchment-200">
           <ReceiptTypeIcon type={type} size={24} />
         </div>
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h3 className="font-display text-2xl text-ink-900 leading-tight">
-              {title}
-            </h3>
-            {source === 'synthetic' && <Badge source="synthetic" label="Synthetic" size="sm" />}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-display text-2xl text-ink-900 leading-tight">
+                {title}
+              </h3>
+              {source === 'synthetic' && <Badge source="synthetic" label="Synthetic" size="sm" />}
+            </div>
+            <div className="flex items-center gap-1">
+              <BookmarkButton
+                targetId={receipt.id}
+                targetType="receipt"
+                title={title}
+                subtitle={category || type}
+                size={18}
+              />
+              <FeatureButton
+                receiptId={receipt.id}
+                title={title}
+                size={18}
+              />
+            </div>
           </div>
           <time className="font-body text-ink-500 text-sm">
             {formatDate(timestamp, 'EEEE, MMM d, yyyy · h:mm a')}

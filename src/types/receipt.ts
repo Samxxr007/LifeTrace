@@ -16,9 +16,10 @@ export type DataSource =
   | 'household'
   | 'transactions'
   | 'synthetic'
+  | 'user'
   | 'derived';
 
-export type DataProvenance = 'source' | 'synthetic' | 'derived';
+export type DataProvenance = 'source' | 'synthetic' | 'user-created' | 'derived';
 
 export type ExpenseType = 'Expense' | 'Income' | 'Transfer-Out';
 
@@ -45,6 +46,9 @@ export interface LifeReceipt {
   expenseType?: ExpenseType;
   location?: LifeLocation;
   scenarioId?: string;
+  status?: 'future' | 'completed' | 'active';
+  completedAt?: string;
+  plannedEventId?: string;
   metadata: {
     // Music
     artist?: string;

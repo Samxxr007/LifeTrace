@@ -7,12 +7,13 @@ import type {
   DataManifest,
 } from '@/types';
 import {
-  loadAllReceipts,
+  loadUnifiedReceipts,
   loadSpotifyStats,
   loadHouseholdStats,
   loadTransactionStats,
   loadManifest,
 } from '@/engine/normalize';
+import { STORAGE_CHANGE_EVENT, STORAGE_KEYS } from '@/lib/storage';
 
 interface LifeDataState {
   receipts: LifeReceipt[];
@@ -35,9 +36,9 @@ export function useLifeData(): LifeDataState {
     error: null,
   });
 
-  useEffect(() => {
+  const loadData = () => {
     try {
-      const receipts = loadAllReceipts();
+      const receipts = loadUnifiedReceipts();
       const spotifyStats = loadSpotifyStats();
       const householdStats = loadHouseholdStats();
       const transactionStats = loadTransactionStats();
@@ -54,11 +55,34 @@ export function useLifeData(): LifeDataState {
       });
     } catch (err) {
       console.error('Failed to load life data:', err);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isLoading: false,
         error: 'Failed to load archive data. Please refresh.',
       }));
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+
+    const handleStorageChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ key?: string }>;
+      const key = customEvent?.detail?.key;
+      // If user receipts or future events change, re-sync receipts
+      if (!key || key === STORAGE_KEYS.USER_RECEIPTS || key === STORAGE_KEYS.FUTURE_EVENTS) {
+        setState((prev) => ({
+          ...prev,
+          receipts: loadUnifiedReceipts(),
+        }));
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener(STORAGE_CHANGE_EVENT, handleStorageChange);
+      return () => {
+        window.removeEventListener(STORAGE_CHANGE_EVENT, handleStorageChange);
+      };
     }
   }, []);
 

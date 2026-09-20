@@ -17,9 +17,9 @@ export function parseTimestamp(ts: string): Date | null {
   return isValid(d) ? d : null;
 }
 
-export function formatDate(ts: string, fmt = 'MMM d, yyyy'): string {
-  const d = parseTimestamp(ts);
-  if (!d) return 'Unknown date';
+export function formatDate(ts: string | Date, fmt = 'MMM d, yyyy'): string {
+  const d = ts instanceof Date ? ts : parseTimestamp(ts);
+  if (!d || isNaN(d.getTime())) return 'Unknown date';
   return format(d, fmt);
 }
 
@@ -147,6 +147,7 @@ export const SOURCE_LABELS: Record<DataSource, string> = {
   household: 'Household',
   transactions: 'Transactions',
   synthetic: 'Synthetic',
+  user: 'User Created',
   derived: 'Derived',
 };
 

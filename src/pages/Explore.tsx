@@ -34,6 +34,11 @@ const YEAR_PRESETS = [
   { label: '2022–2024', range: ['2022-01-01T00:00:00Z', '2024-12-31T23:59:59Z'] as [string | null, string | null] },
 ];
 
+import { SavedViewsMenu } from '@/components/explore/SavedViewsMenu';
+import { AddReceiptDialog } from '@/components/receipts/AddReceiptDialog';
+import { Plus } from 'lucide-react';
+import type { SavedView } from '@/types';
+
 export default function Explore() {
   const { receipts, isLoading } = useLifeData();
   const { connections } = useConnections(receipts);
@@ -43,6 +48,7 @@ export default function Explore() {
   const [selectedReceipt, setSelectedReceipt] = useState<LifeReceipt | null>(null);
   const [queryInput, setQueryInput] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('All Eras');
+  const [addReceiptOpen, setAddReceiptOpen] = useState(false);
 
   // Debounce search query input
   useEffect(() => {
@@ -51,6 +57,23 @@ export default function Explore() {
     }, 200);
     return () => clearTimeout(timer);
   }, [queryInput, setFilters]);
+
+  const handleApplySavedView = (view: SavedView) => {
+    const viewFilters = view.filters as any;
+    if (viewFilters) {
+      setFilters({
+        query: viewFilters.query || '',
+        types: viewFilters.types || [],
+        sources: viewFilters.sources || [],
+        categories: viewFilters.categories || [],
+        dateRange: viewFilters.dateRange || [null, null],
+        amountRange: viewFilters.amountRange || [null, null],
+      });
+      setQueryInput(viewFilters.query || '');
+      if (viewFilters.sortOrder) setSortOrder(viewFilters.sortOrder);
+      if (viewFilters.selectedPeriod) setSelectedPeriod(viewFilters.selectedPeriod);
+    }
+  };
 
   // Extract top categories for filter dropdown
   const categories = useMemo(() => {
@@ -126,16 +149,34 @@ export default function Explore() {
     <div className="min-h-screen bg-parchment-100 text-ink-900 font-body pt-12 pb-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="mb-8">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink-500 mb-2">
-            Archival Search & Filter
-          </p>
-          <h1 className="font-display text-4xl md:text-5xl text-ink-900 mb-2">
-            Explore Receipts
-          </h1>
-          <p className="font-body text-sm text-ink-600">
-            Search and inspect individual recorded moments across Music, Household, and Financial datasets.
-          </p>
+        <header className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-ink-500 mb-2">
+              Archival Search & Filter
+            </p>
+            <h1 className="font-display text-4xl md:text-5xl text-ink-900 mb-2">
+              Explore Receipts
+            </h1>
+            <p className="font-body text-sm text-ink-600">
+              Search and inspect individual recorded moments across Music, Household, and Financial datasets.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <SavedViewsMenu
+              currentFilters={filters}
+              currentSort={sortOrder}
+              currentPeriod={selectedPeriod}
+              onApplyView={handleApplySavedView}
+            />
+            <button
+              onClick={() => setAddReceiptOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 hover:bg-ink-800 text-parchment-100 rounded-xs font-mono text-xs uppercase tracking-wider transition-colors shadow-xs"
+            >
+              <Plus size={14} />
+              <span>Add Receipt</span>
+            </button>
+          </div>
         </header>
 
         {/* Search bar */}
@@ -327,6 +368,11 @@ export default function Explore() {
           )}
         </Drawer>
       </div>
+
+      <AddReceiptDialog
+        open={addReceiptOpen}
+        onClose={() => setAddReceiptOpen(false)}
+      />
     </div>
   );
 }

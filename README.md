@@ -25,28 +25,36 @@ The challenge explicitly dictates that a simple chronological feed or administra
 
 ## 💡 How LifeTrace Solves It
 
-LifeTrace implements a **4-stage interactive discovery flow** that guides the user from individual receipts to an interconnected life story:
+LifeTrace implements a **5-stage interactive discovery and personal memory flow**:
 
 1. **Raw Receipts (`/explore`)**:
    - High-performance archival explorer virtualized with `@tanstack/react-virtual` at 60 FPS.
-   - Multi-facet filtering by source (Spotify, Household, Transactions), category, amount range, and date period.
+   - Multi-facet filtering by source (Spotify, Household, Transactions, Synthetic, User), category, amount range, and date period.
    - Instant client-side fuzzy search powered by Fuse.js.
-   - Slide-in moment drawer with verifiable metadata and direct links to connected receipts.
+   - In-memory **Saved Views** with 1-click filter restoration.
+   - Slide-in moment drawer with verifiable metadata, bookmarking, and direct links to connected receipts.
 
-2. **Macro Insights (`/journey`)**:
-   - Interactive temporal scrubber spanning 2013 to 2024 with real quarterly density histograms and chapter markers.
-   - Preset time periods: *All Eras (2013–2024)*, *The Convergence (2015–2018)*, *Early Soundtrack (2013–2015)*, and *Digital Finance Era (2022–2024)*.
+2. **Macro Insights & Relive (`/journey`)**:
+   - Interactive temporal scrubber with dynamic past-to-future continuum, time granularity (All/Year/Month/Week/Day), and domain filters.
+   - **Relive Experience**: Curated ±6h window (expandable to ±24h) inspecting surrounding moments, multi-domain activity breakdown, active relationships, and 1-click **"Journal This Day"** linking.
    - Real-time macro statistics updating dynamically as the timeline is scrubbed.
 
 3. **Evidence-Based Connections (`/discover?view=connections`)**:
-   - Evaluates multi-signal correlation (temporal proximity, categorical resonance, time of day, weekly rhythms).
-   - Side-by-side moment comparison with domain badges and category resonance indicators.
+   - Evaluates multi-signal correlation (temporal proximity, categorical resonance, time of day, weekly rhythms, shared scenarios) across all 10 life domains.
+   - Composable Type Pair and Strength filters (Strong / Moderate) with live count badges.
    - Explicit **"CONNECTED BECAUSE"** evidence bullets detailing quantifiable reasons for the link.
 
 4. **Narrative Stories & Patterns (`/discover?view=stories` & `/discover?view=patterns`)**:
    - Dynamic life chapters synthesized from record density and domain dominance.
    - Empirical pattern detection (listening heatmaps, subscription life cycles, spending flow, artist recurrence).
    - Strictly data-grounded narratives citing concrete numbers and timestamps.
+
+5. **Personal Memory Hub (`/my-life`)**:
+   - **Prominent Featured Showcase**: Curated standout moments displayed directly on the profile.
+   - **Personal Diary**: Rich reflections with **Receipt Linking** (attach archive moments directly to journal entries) and user-selected mood (never inferred).
+   - **Bookmarks**: Multi-target bookmarking for receipts, connections, chapters, patterns, and saved views.
+   - **My Receipts**: User-created moments across all 10 domains with collision-resistant `crypto.randomUUID()`.
+   - **Future Plans**: Upcoming events and milestones with countdown badges and 1-click conversion into experienced receipts.
 
 ---
 

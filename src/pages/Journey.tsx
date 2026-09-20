@@ -12,18 +12,24 @@ import { useChapters } from '@/hooks/useChapters';
 import { useJourney } from '@/hooks/useJourney';
 import { formatDateRange, formatCount, TYPE_COLORS } from '@/lib/utils';
 import { ArrowRight, Sparkles, Filter } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { ReliveView } from '@/components/journey/ReliveView';
 
 // Lazy-loaded 3D Life Orbit
 const LifeOrbit = React.lazy(() => import('@/components/visualization/LifeOrbit'));
 
 export default function Journey() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [canUseWebGL, setCanUseWebGL] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
   const [filterSource, setFilterSource] = useState<DataSource | null>(null);
   const [dateRange, setDateRange] = useState<[string, string]>(['2013-01-01T00:00:00Z', '2024-12-31T23:59:59Z']);
+  const [reliveDate, setReliveDate] = useState<string | null>(() => {
+    return searchParams.get('view') === 'relive' ? '2017-07-15T18:00:00Z' : null;
+  });
 
   const { receipts, spotifyStats, householdStats, transactionStats, isLoading } = useLifeData();
   const { connections } = useConnections(receipts);
@@ -202,6 +208,7 @@ export default function Journey() {
             onRangeChange={setDateRange}
             onChapterSelect={(id) => setSelectedChapterId(id)}
             selectedChapterId={selectedChapterId}
+            onOpenRelive={(d) => setReliveDate(d)}
           />
         </div>
       </section>
@@ -307,6 +314,19 @@ export default function Journey() {
         onClose={() => setSelectedChapterId(null)}
         onExploreChapter={handleExploreChapter}
       />
+
+      {/* Relive View Dialog */}
+      {reliveDate && (
+        <ReliveView
+          open={Boolean(reliveDate)}
+          onClose={() => setReliveDate(null)}
+          selectedDateIso={reliveDate}
+          receipts={receipts}
+          onOpenDiaryWithReceipts={(_date, _receiptIds) => {
+            navigate('/my-life');
+          }}
+        />
+      )}
     </div>
   );
 }

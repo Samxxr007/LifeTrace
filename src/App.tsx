@@ -9,6 +9,7 @@ const Landing     = lazy(() => import('@/pages/Landing'));
 const Journey     = lazy(() => import('@/pages/Journey'));
 const Discover    = lazy(() => import('@/pages/Discover'));
 const Explore     = lazy(() => import('@/pages/Explore'));
+const MyLife      = lazy(() => import('@/pages/MyLife'));
 
 const PageFallback = ({ message }: { message?: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-parchment-100">
@@ -39,6 +40,13 @@ export default function App() {
                   <Explore />
                 </Suspense>
               } />
+              <Route path="/my-life"    element={
+                <Suspense fallback={<PageFallback message="Loading your memory hub..." />}>
+                  <MyLife />
+                </Suspense>
+              } />
+              <Route path="/profile"    element={<Navigate to="/my-life" replace />} />
+              <Route path="/relive"     element={<Navigate to="/journey?view=relive" replace />} />
               <Route path="*"           element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

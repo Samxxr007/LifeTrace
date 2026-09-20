@@ -195,4 +195,145 @@ describe('Connection Engine & Multi-Domain Pipeline', () => {
     expect(invalidCount).toBe(0);
     expect(duplicateCount).toBe(0);
   });
+
+  it('8. Cross-Domain Acceptance Test: Evaluates connections across all 10 domain pairs', () => {
+    const baseTime = new Date('2024-05-15T18:00:00Z').getTime();
+
+    // 10 Deterministic domain receipts clustered within 1 hour in Bengaluru
+    const crossDomainFixtures: LifeReceipt[] = [
+      {
+        id: 'cd-music',
+        type: 'music',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime).toISOString(),
+        title: 'Sunset Lofi Beats',
+        tags: ['music', 'lofi'],
+        location: { city: 'Bengaluru' },
+        metadata: { artist: 'Chillhop' },
+      },
+      {
+        id: 'cd-trans',
+        type: 'transaction',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 10 * 60 * 1000).toISOString(),
+        title: 'Starbucks Coffee',
+        category: 'Dining',
+        tags: ['coffee'],
+        location: { city: 'Bengaluru' },
+        metadata: { merchant: 'Starbucks' },
+      },
+      {
+        id: 'cd-expense',
+        type: 'expense',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 15 * 60 * 1000).toISOString(),
+        title: 'Evening Snack',
+        category: 'Food',
+        tags: ['food'],
+        metadata: { paymentMode: 'UPI' },
+      },
+      {
+        id: 'cd-place',
+        type: 'place',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 20 * 60 * 1000).toISOString(),
+        title: 'Forum Mall',
+        tags: ['shopping'],
+        location: { city: 'Bengaluru', locationName: 'Forum Mall' },
+        metadata: { placeName: 'Forum Mall' },
+      },
+      {
+        id: 'cd-movie',
+        type: 'movie',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 25 * 60 * 1000).toISOString(),
+        title: 'Dune: Part Two',
+        category: 'Entertainment',
+        tags: ['cinema'],
+        location: { city: 'Bengaluru' },
+        metadata: { movie: 'Dune: Part Two' },
+      },
+      {
+        id: 'cd-search',
+        type: 'search',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 30 * 60 * 1000).toISOString(),
+        title: 'Best dinner near Forum Mall',
+        tags: ['search'],
+        metadata: { searchQuery: 'Best dinner near Forum Mall' },
+      },
+      {
+        id: 'cd-photo',
+        type: 'photo',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 35 * 60 * 1000).toISOString(),
+        title: 'Mall fountain photo',
+        tags: ['photo'],
+        location: { city: 'Bengaluru', locationName: 'Forum Mall' },
+        metadata: { photoCaption: 'Mall fountain photo' },
+      },
+      {
+        id: 'cd-event',
+        type: 'event',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 40 * 60 * 1000).toISOString(),
+        title: 'Tech Meetup Bengaluru',
+        category: 'Event',
+        tags: ['tech', 'meetup'],
+        location: { city: 'Bengaluru', locationName: 'Forum Mall' },
+        metadata: {},
+      },
+      {
+        id: 'cd-message',
+        type: 'message',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 45 * 60 * 1000).toISOString(),
+        title: 'Arrived at the meetup',
+        tags: ['message'],
+        metadata: { messageText: 'Arrived at the meetup' },
+      },
+      {
+        id: 'cd-note',
+        type: 'note',
+        source: 'user',
+        provenance: 'user-created',
+        timestamp: new Date(baseTime + 50 * 60 * 1000).toISOString(),
+        title: 'Notes on AI presentation',
+        tags: ['note'],
+        metadata: { notes: 'Great discussion on agentic systems' },
+      },
+    ];
+
+    const connections = findConnections(crossDomainFixtures);
+    expect(connections.length).toBeGreaterThan(0);
+
+    const strongConns = connections.filter((c) => c.strength === 'strong');
+    const moderateConns = connections.filter((c) => c.strength === 'moderate');
+
+    expect(strongConns.length).toBeGreaterThan(0);
+    expect(moderateConns.length).toBeGreaterThan(0);
+
+    // Verify key pairs fired
+    const pairKeys = new Set(
+      connections.map((c) => {
+        const rA = crossDomainFixtures.find((r) => r.id === c.sourceId);
+        const rB = crossDomainFixtures.find((r) => r.id === c.targetId);
+        return [rA?.type, rB?.type].sort().join('↔');
+      })
+    );
+
+    expect(pairKeys.has('music↔transaction')).toBe(true);
+    expect(pairKeys.has('movie↔place') || pairKeys.has('movie↔transaction')).toBe(true);
+    expect(pairKeys.has('photo↔place')).toBe(true);
+    expect(pairKeys.has('event↔message') || pairKeys.has('event↔place')).toBe(true);
+  });
 });

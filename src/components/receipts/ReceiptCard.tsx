@@ -3,6 +3,8 @@ import { cn, formatDate, formatAmount } from '@/lib/utils';
 import type { LifeReceipt } from '@/types';
 import { ReceiptTypeIcon } from './ReceiptTypeIcon';
 import { Badge } from '../ui/Badge';
+import { BookmarkButton } from '../common/BookmarkButton';
+import { FeatureButton } from '../common/FeatureButton';
 
 export interface ReceiptCardProps {
   receipt: LifeReceipt;
@@ -10,6 +12,7 @@ export interface ReceiptCardProps {
   onClick?: (receipt: LifeReceipt) => void;
   highlighted?: boolean;
   showSource?: boolean;
+  showActions?: boolean;
 }
 
 const ReceiptCard = React.memo(({
@@ -17,7 +20,8 @@ const ReceiptCard = React.memo(({
   compact = false,
   onClick,
   highlighted = false,
-  showSource = false
+  showSource = false,
+  showActions = true,
 }: ReceiptCardProps) => {
   if (!receipt) return null;
   const { type, title, timestamp, amount, source, category, metadata } = receipt;
@@ -25,10 +29,24 @@ const ReceiptCard = React.memo(({
   const isSynthetic = source === 'synthetic';
   const displaySubtitle = metadata?.artist || category || type;
 
-  const content = (
+  return (
     <article
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={onClick ? `View details for ${title}` : undefined}
+      onClick={onClick ? () => onClick(receipt) : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick(receipt);
+              }
+            }
+          : undefined
+      }
       className={cn(
-        'group flex items-center justify-between border-b border-ink-300 transition-colors',
+        'group flex items-center justify-between border-b border-ink-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-900',
         highlighted ? 'bg-parchment-200' : 'bg-transparent',
         onClick ? 'hover:bg-parchment-200 cursor-pointer' : '',
         compact ? 'py-3 px-4' : 'py-5 px-4'
@@ -60,29 +78,31 @@ const ReceiptCard = React.memo(({
         </div>
       </div>
 
-      {amount !== undefined && amount !== null && (
-        <div className="shrink-0 ml-4 text-right">
-          <span className="font-mono text-ink-900 font-medium text-sm">
+      <div className="shrink-0 ml-4 flex items-center gap-1.5 text-right">
+        {amount !== undefined && amount !== null && (
+          <span className="font-mono text-ink-900 font-medium text-sm mr-2">
             {formatAmount(amount)}
           </span>
-        </div>
-      )}
+        )}
+        {showActions && (
+          <>
+            <BookmarkButton
+              targetId={receipt.id}
+              targetType="receipt"
+              title={title}
+              subtitle={displaySubtitle}
+              size={14}
+            />
+            <FeatureButton
+              receiptId={receipt.id}
+              title={title}
+              size={14}
+            />
+          </>
+        )}
+      </div>
     </article>
   );
-
-  if (onClick) {
-    return (
-      <button
-        onClick={() => onClick(receipt)}
-        className="w-full text-left focus:outline-none focus-visible:outline-2 focus-visible:outline-ink-900 block"
-        aria-label={`View details for ${title}`}
-      >
-        {content}
-      </button>
-    );
-  }
-
-  return content;
 });
 
 ReceiptCard.displayName = 'ReceiptCard';

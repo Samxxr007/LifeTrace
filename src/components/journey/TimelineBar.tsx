@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react';
-import type { Chapter, LifeReceipt } from '@/types';
+import React, { useState, useMemo } from 'react';
+import type { Chapter, LifeReceipt, ReceiptType } from '@/types';
 import { TYPE_COLORS, parseTimestamp, formatDateShort } from '@/lib/utils';
-import { QUICK_PERIODS, QuickPeriod } from '@/hooks/useJourney';
-import { Sparkles } from 'lucide-react';
+import { QUICK_PERIODS } from '@/hooks/useJourney';
+import { Sparkles, Clock, Calendar, Filter } from 'lucide-react';
+
+export type TimeGranularity = 'all' | 'year' | 'month' | 'week' | 'day';
 
 interface TimelineBarProps {
   receipts: LifeReceipt[];
@@ -12,6 +14,7 @@ interface TimelineBarProps {
   onRangeChange: (range: [string, string]) => void;
   onChapterSelect?: (chapterId: string) => void;
   selectedChapterId?: string | null;
+  onOpenRelive?: (dateIso: string) => void;
 }
 
 export default function TimelineBar({
@@ -22,32 +25,79 @@ export default function TimelineBar({
   onRangeChange,
   onChapterSelect,
   selectedChapterId,
+  onOpenRelive,
 }: TimelineBarProps) {
-  const minTime = useMemo(() => new Date('2013-01-01T00:00:00Z').getTime(), []);
-  const maxTime = useMemo(() => new Date('2024-12-31T23:59:59Z').getTime(), []);
-  const totalDuration = maxTime - minTime;
+  const [granularity, setGranularity] = useState<TimeGranularity>('all');
+  const [activeDomainFilter, setActiveDomainFilter] = useState<string>('all');
 
-  // Real density histogram: 48 quarterly buckets across 2013–2024
-  const densityBuckets = useMemo(() => {
-    const BUCKETS = 48;
-    const buckets = Array.from({ length: BUCKETS }, () => ({
-      count: 0,
-      dominantType: 'note' as any,
-    }));
+  // Dynamic time boundaries based on real dataset records (no hardcoded years)
+  const { minTime, maxTime, nowTime } = useMemo(() => {
+    const now = Date.now();
+    if (!receipts || receipts.length === 0) {
+      return {
+        minTime: now - 365 * 24 * 3600 * 1000,
+        maxTime: now + 90 * 24 * 3600 * 1000,
+        nowTime: now,
+      };
+    }
+
+    let min = Infinity;
+    let max = -Infinity;
 
     receipts.forEach((r) => {
       const t = parseTimestamp(r.timestamp)?.getTime();
+      if (t) {
+        if (t < min) min = t;
+        if (t > max) max = t;
+      }
+    });
+
+    // Pad dynamically: ensure at least min is bounded, and max includes upcoming if any
+    const finalMin = isFinite(min) ? min : new Date('2013-01-01T00:00:00Z').getTime();
+    const finalMax = isFinite(max) ? Math.max(max, now) : new Date('2025-12-31T23:59:59Z').getTime();
+
+    return { minTime: finalMin, maxTime: finalMax, nowTime: now };
+  }, [receipts]);
+
+  const totalDuration = Math.max(1, maxTime - minTime);
+
+  // Filter receipts by active domain if specified
+  const filteredReceipts = useMemo(() => {
+    if (activeDomainFilter === 'all') return receipts;
+    if (activeDomainFilter === 'user') return receipts.filter((r) => r.source === 'user');
+    return receipts.filter((r) => r.type === activeDomainFilter);
+  }, [receipts, activeDomainFilter]);
+
+  // Dynamic density histogram based on granularity
+  const densityBuckets = useMemo(() => {
+    let bucketCount = 48; // default
+    if (granularity === 'year') bucketCount = 24;
+    else if (granularity === 'month') bucketCount = 60;
+    else if (granularity === 'week') bucketCount = 80;
+    else if (granularity === 'day') bucketCount = 100;
+
+    const buckets = Array.from({ length: bucketCount }, () => ({
+      count: 0,
+      dominantType: 'note' as ReceiptType,
+      isFuture: false,
+    }));
+
+    filteredReceipts.forEach((r) => {
+      const t = parseTimestamp(r.timestamp)?.getTime();
       if (!t || t < minTime || t > maxTime) return;
-      const idx = Math.min(BUCKETS - 1, Math.max(0, Math.floor(((t - minTime) / totalDuration) * BUCKETS)));
+      const idx = Math.min(bucketCount - 1, Math.max(0, Math.floor(((t - minTime) / totalDuration) * bucketCount)));
       buckets[idx].count++;
+      if (t >= nowTime) buckets[idx].isFuture = true;
       if (r.type === 'music') buckets[idx].dominantType = 'music';
       else if (r.type === 'expense') buckets[idx].dominantType = 'expense';
       else if (r.type === 'transaction') buckets[idx].dominantType = 'transaction';
+      else if (r.type === 'event') buckets[idx].dominantType = 'event';
+      else if (r.type === 'place') buckets[idx].dominantType = 'place';
     });
 
     const maxCount = Math.max(1, ...buckets.map((b) => b.count));
     return { buckets, maxCount };
-  }, [receipts, minTime, maxTime, totalDuration]);
+  }, [filteredReceipts, minTime, maxTime, totalDuration, granularity, nowTime]);
 
   // Selected range percentage for visual highlight
   const selectedPct = useMemo(() => {
@@ -57,6 +107,13 @@ export default function TimelineBar({
     const width = Math.max(2, Math.min(100 - left, ((e - s) / totalDuration) * 100));
     return { left, width };
   }, [selectedRange, minTime, maxTime, totalDuration]);
+
+  // Where "now" sits on the timeline
+  const nowPct = useMemo(() => {
+    if (nowTime < minTime) return 0;
+    if (nowTime > maxTime) return 100;
+    return ((nowTime - minTime) / totalDuration) * 100;
+  }, [nowTime, minTime, maxTime, totalDuration]);
 
   // Chapter markers with real date positions
   const chapterMarkers = useMemo(() => {
@@ -78,23 +135,96 @@ export default function TimelineBar({
     const clickX = e.clientX - rect.left;
     const pct = Math.max(0, Math.min(1, clickX / rect.width));
     const targetTime = minTime + pct * totalDuration;
-    const targetYear = new Date(targetTime).getFullYear();
 
-    // Set 2-year window around clicked year
-    const startYear = Math.max(2013, targetYear - 1);
-    const endYear = Math.min(2024, targetYear + 1);
-    onRangeChange([`${startYear}-01-01T00:00:00Z`, `${endYear}-12-31T23:59:59Z`]);
+    // Window size depends on granularity
+    let windowSpan = 365 * 24 * 3600 * 1000; // 1 year default
+    if (granularity === 'month') windowSpan = 30 * 24 * 3600 * 1000;
+    else if (granularity === 'week') windowSpan = 7 * 24 * 3600 * 1000;
+    else if (granularity === 'day') windowSpan = 24 * 3600 * 1000;
+
+    const start = new Date(Math.max(minTime, targetTime - windowSpan / 2)).toISOString();
+    const end = new Date(Math.min(maxTime, targetTime + windowSpan / 2)).toISOString();
+
+    onRangeChange([start, end]);
   };
 
-  const isAllSelected = selectedRange[0].includes('2013') && selectedRange[1].includes('2024');
+  const startYear = new Date(minTime).getFullYear();
+  const endYear = new Date(maxTime).getFullYear();
+  const currentSelectedStart = new Date(selectedRange[0]).toLocaleDateString();
+  const currentSelectedEnd = new Date(selectedRange[1]).toLocaleDateString();
 
   return (
-    <div className="w-full bg-parchment-100 flex flex-col space-y-3" role="group" aria-label="Interactive timeline scrubber">
-      {/* Top Header: Quick Period Selectors + Active Range Label */}
+    <div
+      className="w-full bg-parchment-100 flex flex-col space-y-3"
+      role="group"
+      aria-label="Interactive timeline scrubber"
+    >
+      {/* Top Header: Granularity + Domain Filters + Relive CTA */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink-200/80 pb-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-500 mr-1 hidden sm:inline">
+            Granularity:
+          </span>
+          {(['all', 'year', 'month', 'week', 'day'] as TimeGranularity[]).map((g) => (
+            <button
+              key={g}
+              onClick={() => setGranularity(g)}
+              className={`px-2 py-0.5 rounded-xs font-mono text-[11px] uppercase transition-colors border ${
+                granularity === g
+                  ? 'bg-ink-900 text-parchment-100 border-ink-900 font-bold'
+                  : 'bg-parchment-200 text-ink-700 border-ink-300 hover:border-ink-600'
+              }`}
+            >
+              {g}
+            </button>
+          ))}
+
+          <div className="h-4 w-px bg-ink-300 mx-1 hidden sm:block" />
+
+          {/* Domain Filter Pills */}
+          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-500 mr-1 hidden sm:inline">
+            Domain:
+          </span>
+          {[
+            { id: 'all', label: 'All' },
+            { id: 'music', label: 'Music' },
+            { id: 'expense', label: 'Expense' },
+            { id: 'transaction', label: 'Transact' },
+            { id: 'place', label: 'Places' },
+            { id: 'user', label: 'User Added' },
+          ].map((df) => (
+            <button
+              key={df.id}
+              onClick={() => setActiveDomainFilter(df.id)}
+              className={`px-2 py-0.5 rounded-xs font-mono text-[11px] transition-colors ${
+                activeDomainFilter === df.id
+                  ? 'bg-ink-800 text-parchment-100 font-bold'
+                  : 'bg-parchment-200/80 text-ink-600 hover:bg-parchment-300'
+              }`}
+            >
+              {df.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Relive This Period Button */}
+        {onOpenRelive && (
+          <button
+            onClick={() => onOpenRelive(selectedRange[0])}
+            className="flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-xs font-mono text-xs font-bold transition-all shadow-xs"
+            title="Inspect surrounding moments and active connections for this date"
+          >
+            <Clock size={13} />
+            <span>Relive Selected Date</span>
+          </button>
+        )}
+      </div>
+
+      {/* Preset Quick Periods */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="font-mono text-[11px] uppercase tracking-wider text-ink-500 mr-1 hidden sm:inline">
-            Period:
+            Presets:
           </span>
           {QUICK_PERIODS.map((p) => {
             const isSelected =
@@ -124,16 +254,14 @@ export default function TimelineBar({
         {/* Selected Period Indicator */}
         <div className="font-mono text-xs text-ink-600 flex items-center gap-2">
           <span>
-            {new Date(selectedRange[0]).getFullYear()} — {new Date(selectedRange[1]).getFullYear()}
+            {currentSelectedStart} — {currentSelectedEnd}
           </span>
-          {!isAllSelected && (
-            <button
-              onClick={() => onRangeChange(['2013-01-01T00:00:00Z', '2024-12-31T23:59:59Z'])}
-              className="text-[11px] underline text-ink-500 hover:text-ink-900"
-            >
-              Reset to All
-            </button>
-          )}
+          <button
+            onClick={() => onRangeChange([new Date(minTime).toISOString(), new Date(maxTime).toISOString()])}
+            className="text-[11px] underline text-ink-500 hover:text-ink-900"
+          >
+            Reset All
+          </button>
         </div>
       </div>
 
@@ -143,24 +271,25 @@ export default function TimelineBar({
         className="h-16 w-full bg-parchment-200 border border-ink-300 relative cursor-pointer select-none rounded-xs overflow-hidden"
         title="Click anywhere to scrub timeline period"
         role="slider"
-        aria-valuemin={2013}
-        aria-valuemax={2024}
-        aria-valuenow={new Date(selectedRange[0]).getFullYear()}
+        aria-valuemin={startYear}
+        aria-valuemax={endYear}
         aria-label="Timeline scrubber"
         tabIndex={0}
       >
-        {/* The Convergence Overlap Highlight (2015–2018) */}
-        <div
-          className="absolute top-0 bottom-0 bg-amber-500/15 border-x border-amber-500/40 pointer-events-none"
-          style={{
-            left: `${((new Date('2015-01-01').getTime() - minTime) / totalDuration) * 100}%`,
-            width: `${((new Date('2018-12-31').getTime() - new Date('2015-01-01').getTime()) / totalDuration) * 100}%`,
-          }}
-        >
-          <span className="absolute top-1 left-2 font-mono text-[9px] uppercase tracking-widest text-amber-800 font-bold hidden sm:inline">
-            Convergence
-          </span>
-        </div>
+        {/* Dynamic Future / Upcoming Zone (if now is within timeline span) */}
+        {nowPct > 0 && nowPct < 100 && (
+          <div
+            className="absolute top-0 bottom-0 bg-amber-500/10 border-l border-dashed border-amber-600/60 pointer-events-none"
+            style={{
+              left: `${nowPct}%`,
+              right: 0,
+            }}
+          >
+            <span className="absolute top-1 right-2 font-mono text-[9px] uppercase tracking-widest text-amber-800 font-bold hidden sm:inline">
+              Upcoming / Future
+            </span>
+          </div>
+        )}
 
         {/* Density Histogram Bars */}
         <div className="absolute inset-0 flex items-end px-1 pb-1 gap-px pointer-events-none opacity-80">
@@ -169,10 +298,13 @@ export default function TimelineBar({
             return (
               <div
                 key={i}
-                className="flex-1 rounded-t-xs"
+                className="flex-1 rounded-t-xs transition-all"
                 style={{
                   height: `${heightPct}%`,
-                  backgroundColor: TYPE_COLORS[bucket.dominantType] || '#8A8480',
+                  backgroundColor: bucket.isFuture
+                    ? '#C4622D'
+                    : TYPE_COLORS[bucket.dominantType] || '#8A8480',
+                  opacity: bucket.count === 0 ? 0.2 : 0.9,
                 }}
               />
             );
@@ -181,7 +313,7 @@ export default function TimelineBar({
 
         {/* Selected Window Range Shading */}
         <div
-          className="absolute top-0 bottom-0 border-x-2 border-ink-900 bg-ink-900/10 pointer-events-none transition-all duration-200"
+          className="absolute top-0 bottom-0 border-x-2 border-ink-900 bg-ink-900/10 pointer-events-none transition-all duration-150"
           style={{
             left: `${selectedPct.left}%`,
             width: `${selectedPct.width}%`,
@@ -212,11 +344,11 @@ export default function TimelineBar({
         </div>
       </div>
 
-      {/* Year Scale Labels */}
+      {/* Year Scale Labels (Dynamic) */}
       <div className="flex justify-between items-center text-[11px] font-mono text-ink-500 px-0.5">
-        <span>2013 (Spotify Launch)</span>
-        <span className="text-amber-800 font-medium">2015–2018 (Convergence)</span>
-        <span>2022–2024 (Financial Era)</span>
+        <span>{startYear} (Earliest Trace)</span>
+        <span className="text-amber-800 font-medium">Historical Continuous Archive</span>
+        <span>{endYear} (Present & Horizon)</span>
       </div>
     </div>
   );

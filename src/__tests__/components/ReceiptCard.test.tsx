@@ -79,7 +79,7 @@ describe('ReceiptCard', () => {
 
   it('has correct aria attributes when interactive', () => {
     render(<ReceiptCard receipt={mockReceipt} onClick={vi.fn()} />);
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: /View details for Morning Coffee/i });
     expect(button).toHaveAttribute('aria-label', 'View details for Morning Coffee');
   });
 });
