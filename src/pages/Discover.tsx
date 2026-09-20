@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ConnectionChain } from '@/components/discover/ConnectionChain';
 import { ConnectionExplainer } from '@/components/discover/ConnectionExplainer';
 import { ConnectionFilters } from '@/components/discover/ConnectionFilters';
@@ -25,6 +25,7 @@ interface FilterState {
 
 export default function Discover() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const currentView = searchParams.get('view') || 'connections';
 
   const { receipts, spotifyStats, householdStats, isLoading } = useLifeData();
@@ -266,8 +267,8 @@ export default function Discover() {
                     <ChapterCard
                       chapter={chapter}
                       index={i}
-                      onExplore={(id) => {
-                        console.log('Explore chapter:', id);
+                      onExplore={(_id) => {
+                        navigate('/explore');
                       }}
                     />
                     {i < chapters.length - 1 && (

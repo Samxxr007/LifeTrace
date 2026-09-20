@@ -9,9 +9,9 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useLifeData } from '@/hooks/useLifeData';
 import { useConnections } from '@/hooks/useConnections';
 import { useChapters } from '@/hooks/useChapters';
-import { computeInsights } from '@/engine/insights';
+import { useJourney } from '@/hooks/useJourney';
 import { formatDateRange, formatCount, TYPE_COLORS } from '@/lib/utils';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Lazy-loaded 3D Life Orbit
@@ -28,6 +28,18 @@ export default function Journey() {
   const { receipts, spotifyStats, householdStats, transactionStats, isLoading } = useLifeData();
   const { connections } = useConnections(receipts);
   const { chapters } = useChapters(receipts, connections);
+
+  // Isolate Journey domain calculations in dedicated hook
+  const { filteredChapters, insights, isConvergenceActive } = useJourney(
+    receipts,
+    connections,
+    chapters,
+    dateRange,
+    filterSource,
+    spotifyStats,
+    householdStats,
+    transactionStats
+  );
 
   useEffect(() => {
     try {
@@ -56,16 +68,7 @@ export default function Journey() {
 
   const selectedChapter = chapters.find((c) => c.id === selectedChapterId) || null;
   const use3D = canUseWebGL && !prefersReducedMotion;
-
-  const insights = computeInsights(
-    receipts,
-    connections,
-    [],
-    chapters,
-    spotifyStats || ({} as any),
-    householdStats || ({} as any),
-    transactionStats || ({} as any)
-  );
+  const isPeriodFiltered = !dateRange[0].includes('2013') || !dateRange[1].includes('2024');
 
   return (
     <div className="w-full min-h-screen bg-parchment-100 flex flex-col font-body text-ink-900 pb-28">
@@ -131,7 +134,7 @@ export default function Journey() {
               }
             >
               <LifeOrbit
-                chapters={chapters}
+                chapters={filteredChapters}
                 receipts={receipts}
                 selectedChapterId={selectedChapterId}
                 onNodeSelect={handleNodeSelect}
@@ -141,7 +144,7 @@ export default function Journey() {
           </ErrorBoundary>
         ) : (
           <LifeOrbit2D
-            chapters={chapters}
+            chapters={filteredChapters}
             receipts={receipts}
             selectedChapterId={selectedChapterId}
             onNodeSelect={handleNodeSelect}
@@ -150,12 +153,26 @@ export default function Journey() {
         )}
 
         {/* Minimal, non-intrusive convergence badge */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-          <div className="inline-flex items-center gap-1.5 bg-parchment-50/90 backdrop-blur-sm border border-ink-300 px-3 py-1 rounded-full text-xs font-mono text-ink-700 shadow-xs">
-            <Sparkles size={12} className="text-amber-600" />
-            <span>2015–2018 Convergence: Music & Daily Life Intersect</span>
+        {isConvergenceActive && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none z-10">
+            <div className="inline-flex items-center gap-1.5 bg-parchment-50/90 backdrop-blur-sm border border-amber-400 px-3 py-1 rounded-full text-xs font-mono text-amber-900 shadow-xs">
+              <Sparkles size={12} className="text-amber-600" />
+              <span>2015–2018 Convergence: Music & Daily Life Intersect</span>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Active Period / Filter Indicator */}
+        {isPeriodFiltered && (
+          <div className="absolute bottom-3 left-3 z-10">
+            <span className="bg-ink-900 text-parchment-100 text-[11px] font-mono px-2.5 py-1 rounded flex items-center gap-1.5 shadow-sm">
+              <Filter size={11} />
+              <span>
+                Filtered: {new Date(dateRange[0]).getFullYear()}–{new Date(dateRange[1]).getFullYear()} ({filteredChapters.length} chapters)
+              </span>
+            </span>
+          </div>
+        )}
 
         {/* Legend */}
         <div className="absolute bottom-2 left-4 pointer-events-none z-10 flex items-center gap-3 font-mono text-[10px] text-ink-500 uppercase tracking-wider hidden sm:flex">
@@ -174,7 +191,7 @@ export default function Journey() {
         </div>
       </section>
 
-      {/* Timeline Scrubber */}
+      {/* Interactive Timeline Scrubber */}
       <section className="w-full bg-parchment-100 py-4 border-b border-ink-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <TimelineBar
@@ -183,6 +200,8 @@ export default function Journey() {
             dateRange={['2013-01-01', '2024-12-31']}
             selectedRange={dateRange}
             onRangeChange={setDateRange}
+            onChapterSelect={(id) => setSelectedChapterId(id)}
+            selectedChapterId={selectedChapterId}
           />
         </div>
       </section>
@@ -192,7 +211,9 @@ export default function Journey() {
         <div className="flex justify-between items-baseline mb-6 border-b border-ink-300 pb-3">
           <div>
             <span className="font-mono text-xs uppercase tracking-widest text-ink-500">Chronological Narrative</span>
-            <h3 className="font-display text-2xl text-ink-900">Life Chapters</h3>
+            <h3 className="font-display text-2xl text-ink-900">
+              Life Chapters {isPeriodFiltered && `(${filteredChapters.length} active)`}
+            </h3>
           </div>
           <Link
             to="/discover?view=stories"
@@ -203,56 +224,68 @@ export default function Journey() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {chapters.map((chapter) => {
-            const isSelected = selectedChapterId === chapter.id;
-            return (
-              <div
-                key={chapter.id}
-                onClick={() => setSelectedChapterId(isSelected ? null : chapter.id)}
-                className={`p-6 border transition-all cursor-pointer rounded-sm ${
-                  isSelected
-                    ? 'border-ink-900 bg-parchment-200 shadow-md'
-                    : 'border-ink-300 bg-parchment-50 hover:bg-parchment-200'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <span
-                    className="font-mono text-xs uppercase font-medium"
-                    style={{ color: TYPE_COLORS[chapter.dominantType] }}
-                  >
-                    {chapter.dominantType}
-                  </span>
-                  <span className="font-mono text-xs text-ink-500">
-                    {formatCount(chapter.stats.totalReceipts)} moments
-                  </span>
+        {filteredChapters.length === 0 ? (
+          <div className="py-12 text-center bg-parchment-200 border border-ink-300 rounded">
+            <p className="font-body text-ink-600 mb-3">No chapters overlap this specific timeline selection.</p>
+            <button
+              onClick={() => setDateRange(['2013-01-01T00:00:00Z', '2024-12-31T23:59:59Z'])}
+              className="font-mono text-xs uppercase tracking-widest text-ink-900 underline"
+            >
+              Reset to All Eras
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredChapters.map((chapter) => {
+              const isSelected = selectedChapterId === chapter.id;
+              return (
+                <div
+                  key={chapter.id}
+                  onClick={() => setSelectedChapterId(isSelected ? null : chapter.id)}
+                  className={`p-6 border transition-all cursor-pointer rounded-sm ${
+                    isSelected
+                      ? 'border-ink-900 bg-parchment-200 shadow-md'
+                      : 'border-ink-300 bg-parchment-50 hover:bg-parchment-200'
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <span
+                      className="font-mono text-xs uppercase font-medium"
+                      style={{ color: TYPE_COLORS[chapter.dominantType] }}
+                    >
+                      {chapter.dominantType}
+                    </span>
+                    <span className="font-mono text-xs text-ink-500">
+                      {formatCount(chapter.stats.totalReceipts)} moments
+                    </span>
+                  </div>
+
+                  <h4 className="font-display text-xl font-bold text-ink-900 mb-1">{chapter.title}</h4>
+                  <p className="font-mono text-xs text-ink-500 mb-4">
+                    {formatDateRange(chapter.dateRange[0], chapter.dateRange[1])}
+                  </p>
+
+                  <p className="font-body text-sm text-ink-700 line-clamp-2 mb-4">
+                    {chapter.narrative || chapter.subtitle}
+                  </p>
+
+                  <div className="flex justify-between items-center text-xs font-mono text-ink-600 pt-3 border-t border-ink-200">
+                    <span>{chapter.stats.topArtist || chapter.dominantCategory || 'Mixed'}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleExploreChapter(chapter.id);
+                      }}
+                      className="hover:text-ink-900 underline underline-offset-2"
+                    >
+                      Read Chapter →
+                    </button>
+                  </div>
                 </div>
-
-                <h4 className="font-display text-xl font-bold text-ink-900 mb-1">{chapter.title}</h4>
-                <p className="font-mono text-xs text-ink-500 mb-4">
-                  {formatDateRange(chapter.dateRange[0], chapter.dateRange[1])}
-                </p>
-
-                <p className="font-body text-sm text-ink-700 line-clamp-2 mb-4">
-                  {chapter.narrative || chapter.subtitle}
-                </p>
-
-                <div className="flex justify-between items-center text-xs font-mono text-ink-600 pt-3 border-t border-ink-200">
-                  <span>{chapter.stats.topArtist || chapter.dominantCategory || 'Mixed'}</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleExploreChapter(chapter.id);
-                    }}
-                    className="hover:text-ink-900 underline underline-offset-2"
-                  >
-                    Read Chapter →
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Aggregate Statistics Section */}
@@ -261,7 +294,9 @@ export default function Journey() {
           <span className="font-mono text-xs uppercase tracking-widest text-ink-500 mb-2 block">
             Macro Analysis
           </span>
-          <h3 className="font-display text-2xl text-ink-900 mb-8">Archive Synthesis</h3>
+          <h3 className="font-display text-2xl text-ink-900 mb-8">
+            Archive Synthesis {isPeriodFiltered && `(${new Date(dateRange[0]).getFullYear()}–${new Date(dateRange[1]).getFullYear()})`}
+          </h3>
           <StatComposition insights={insights} />
         </div>
       </section>
